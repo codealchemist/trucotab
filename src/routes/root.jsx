@@ -1,29 +1,26 @@
 import { Outlet, Link, NavLink } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
+import { useSelector, useDispatch } from 'react-redux'
+import { setTheme } from '../store/settingsSlice'
 
 export default function Root() {
-  const [theme, setTheme] = useState("dark")
+  const dispatch = useDispatch()
+  const theme = useSelector(s => s.settings.theme)
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("trucotab.theme")
-      if (saved === "light" || saved === "dark") setTheme(saved)
-    } catch (e) {}
-  }, [])
+    console.log('RENDER ROOT')
+  })
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme)
-    try {
-      localStorage.setItem("trucotab.theme", theme)
-    } catch (e) {}
+    document.documentElement.setAttribute("data-theme", theme || 'dark')
   }, [theme])
 
   // theme toggle keyboard shortcut: 't'
   useEffect(() => {
     const onKey = (e) => {
       if (e.key && e.key.toLowerCase() === "t") {
-        setTheme((t) => (t === "dark" ? "light" : "dark"))
+        dispatch(setTheme(theme === 'dark' ? 'light' : 'dark'))
       }
     }
     document.addEventListener("keydown", onKey)
@@ -56,7 +53,7 @@ export default function Root() {
         <div>
           <button
             className="theme-toggle"
-            onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+            onClick={() => dispatch(setTheme(theme === 'dark' ? 'light' : 'dark'))}
           >
             {theme === "dark" ? "Light" : "Dark"}
           </button>
