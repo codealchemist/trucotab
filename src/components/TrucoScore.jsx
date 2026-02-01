@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 
 const STORAGE_KEY = "trucotab.match"
 
@@ -17,6 +17,66 @@ export default function TrucoScore() {
   const [showWinner, setShowWinner] = useState(false)
   const [winner, setWinner] = useState(null)
   const [winnerAcknowledged, setWinnerAcknowledged] = useState(false)
+
+  const audioCtxRef = useRef(null)
+
+  useEffect(() => {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext
+      if (Ctx) audioCtxRef.current = new Ctx()
+    } catch (e) {
+      audioCtxRef.current = null
+    }
+    return () => {
+      try {
+        if (audioCtxRef.current) audioCtxRef.current.close()
+      } catch (e) {}
+    }
+  }, [])
+
+  const isSoundEnabled = () => {
+    try {
+      const raw = localStorage.getItem("trucotab.settings")
+      if (!raw) return false
+      const parsed = JSON.parse(raw)
+      return Boolean(parsed.soundEnabled)
+    } catch (e) {
+      return false
+    }
+  }
+
+  const playTone = (freq, when = 0, dur = 0.12, type = "sine") => {
+    const ctx = audioCtxRef.current
+    if (!ctx) return
+    try {
+      const o = ctx.createOscillator()
+      const g = ctx.createGain()
+      o.type = type
+      o.frequency.value = freq
+      o.connect(g)
+      g.connect(ctx.destination)
+      const start = ctx.currentTime + when
+      g.gain.setValueAtTime(0.0001, start)
+      g.gain.exponentialRampToValueAtTime(0.12, start + 0.01)
+      o.start(start)
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur)
+      o.stop(start + dur + 0.02)
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  const playClick = () => {
+    if (!isSoundEnabled()) return
+    playTone(1000, 0, 0.08, "square")
+  }
+
+  const playWin = () => {
+    if (!isSoundEnabled()) return
+    playTone(660, 0, 0.14, "sine")
+    playTone(880, 0.12, 0.16, "sine")
+    playTone(990, 0.28, 0.22, "sine")
+  }
 
   // load from localStorage on mount
   useEffect(() => {
@@ -68,6 +128,8 @@ export default function TrucoScore() {
       setWinner(who)
       setShowWinner(true)
       setWinnerAcknowledged(false)
+      // play win sound
+      try { playWin() } catch (e) {}
       const t = setTimeout(() => { setShowWinner(false); setWinnerAcknowledged(true) }, 3000)
       return () => clearTimeout(t)
     }
@@ -138,10 +200,12 @@ export default function TrucoScore() {
   const inc = (side) => {
     if (side === "left") setLeftScore((s) => Math.min(s + 1, maxScore))
     else setRightScore((s) => Math.min(s + 1, maxScore))
+    playClick()
   }
   const dec = (side) => {
     if (side === "left") setLeftScore((s) => Math.max(s - 1, 0))
     else setRightScore((s) => Math.max(s - 1, 0))
+    playClick()
   }
 
   const reset = () => {
