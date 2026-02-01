@@ -53,11 +53,6 @@ export default function Root() {
           <h1>TrucoTab</h1>
         </div>
 
-        <nav className="main-nav">
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-
         <div>
           <button
             className="theme-toggle"
