@@ -1,13 +1,26 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import {
-  setLeftName, setRightName, setLeftEmoji, setRightEmoji,
-  setMatchType, setLeftScore, setRightScore, incLeft, decLeft, incRight, decRight, resetMatch,
-  selectMatch, selectMaxScore
+  setLeftName,
+  setRightName,
+  setLeftEmoji,
+  setRightEmoji,
+  setMatchType,
+  setLeftScore,
+  setRightScore,
+  incLeft,
+  decLeft,
+  incRight,
+  decRight,
+  resetMatch,
+  selectMatch,
+  selectMaxScore,
 } from '../store/matchSlice'
+import { resetScores } from '../store/matchSlice'
+import { addLog } from '../store/logSlice'
 
-const EMOJIS = ["🂠", "😀", "😎", "🃏", "🎉", "🥇", "🔥"]
+const EMOJIS = ['🂠', '😀', '😎', '🃏', '🎉', '🥇', '🔥']
 
 export default function TrucoScore() {
   const dispatch = useDispatch()
@@ -25,6 +38,7 @@ export default function TrucoScore() {
   const [showWinner, setShowWinner] = useState(false)
   const [winner, setWinner] = useState(null)
   const [winnerAcknowledged, setWinnerAcknowledged] = useState(false)
+  const [loggedThisMatch, setLoggedThisMatch] = useState(false)
 
   const audioCtxRef = useRef(null)
 
@@ -46,7 +60,7 @@ export default function TrucoScore() {
   const soundEnabled = useSelector(s => s.settings.soundEnabled)
   const theme = useSelector(s => s.settings.theme)
 
-  const playTone = (freq, when = 0, dur = 0.12, type = "sine") => {
+  const playTone = (freq, when = 0, dur = 0.12, type = 'sine') => {
     const ctx = audioCtxRef.current
     if (!ctx) return
     try {
@@ -67,26 +81,45 @@ export default function TrucoScore() {
     }
   }
 
-  const playClick = () => { if (soundEnabled) playTone(1000, 0, 0.08, 'square') }
-  const playWin = () => { if (soundEnabled) { playTone(660,0,0.14,'sine'); playTone(880,0.12,0.16,'sine'); playTone(990,0.28,0.22,'sine') } }
+  const playClick = () => {
+    if (soundEnabled) playTone(1000, 0, 0.08, 'square')
+  }
+  const playWin = () => {
+    if (soundEnabled) {
+      playTone(660, 0, 0.14, 'sine')
+      playTone(880, 0.12, 0.16, 'sine')
+      playTone(990, 0.28, 0.22, 'sine')
+    }
+  }
 
   // When matchType changes ensure stored scores are clamped to new max
   useEffect(() => {
-    const clamp = (v) => Math.min(Math.max(0, v), maxScore)
+    const clamp = v => Math.min(Math.max(0, v), maxScore)
     if (leftScore !== clamp(leftScore)) dispatch(setLeftScore(clamp(leftScore)))
-    if (rightScore !== clamp(rightScore)) dispatch(setRightScore(clamp(rightScore)))
+    if (rightScore !== clamp(rightScore))
+      dispatch(setRightScore(clamp(rightScore)))
   }, [matchType, leftScore, rightScore, dispatch])
 
   // show winner overlay when someone reaches maxScore
   useEffect(() => {
-    if ((leftScore === maxScore || rightScore === maxScore) && !showWinner && !winnerAcknowledged) {
+    if (
+      (leftScore === maxScore || rightScore === maxScore) &&
+      !showWinner &&
+      !winnerAcknowledged
+    ) {
       const who = leftScore === maxScore ? 'left' : 'right'
       setWinner(who)
       setShowWinner(true)
       setWinnerAcknowledged(false)
+      setLoggedThisMatch(false)
       // play win sound
-      try { playWin() } catch (e) {}
-      const t = setTimeout(() => { setShowWinner(false); setWinnerAcknowledged(true) }, 3000)
+      try {
+        playWin()
+      } catch (e) {}
+      const t = setTimeout(() => {
+        setShowWinner(false)
+        setWinnerAcknowledged(true)
+      }, 3000)
       return () => clearTimeout(t)
     }
   }, [leftScore, rightScore, maxScore, showWinner])
@@ -100,69 +133,71 @@ export default function TrucoScore() {
 
   // keyboard shortcuts
   useEffect(() => {
-    const onKey = (e) => {
+    const onKey = e => {
       // ignore shortcut handling until persistence finished rehydration
       if (!rehydrated) return
       const tag = e.target && e.target.tagName
-      if (tag === "INPUT" || e.target.isContentEditable) return
+      if (tag === 'INPUT' || e.target.isContentEditable) return
       const k = e.key.toLowerCase()
       // don't trigger clear on Ctrl/C / Cmd/C (copy) or other modifiers
       if (k === 'c' && (e.ctrlKey || e.metaKey)) return
       switch (k) {
-        case "q":
-          inc("left")
+        case 'q':
+          inc('left')
           break
-        case "a":
-          dec("left")
+        case 'a':
+          dec('left')
           break
-        case "p":
-          inc("right")
+        case 'p':
+          inc('right')
           break
-        case "l":
-          dec("right")
+        case 'l':
+          dec('right')
           break
-          case "c":
-            confirmClear()
-            break
-        case "h":
-          dispatch(setMatchType("half"))
+        case 'c':
+          confirmClear()
           break
-        case "f":
-          dispatch(setMatchType("full"))
+        case 'h':
+          dispatch(setMatchType('half'))
+          break
+        case 'f':
+          dispatch(setMatchType('full'))
           break
         default:
           break
       }
     }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
   }, [leftScore, rightScore, matchType, rehydrated])
 
   // close emoji picker on Escape
   useEffect(() => {
     if (!pickerOpen) return
-    const onKey = (e) => {
-      if (e.key === "Escape") setPickerOpen(null)
+    const onKey = e => {
+      if (e.key === 'Escape') setPickerOpen(null)
     }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
   }, [pickerOpen])
 
   // prevent body scroll when picker is open
   useEffect(() => {
     if (pickerOpen) {
       const prev = document.body.style.overflow
-      document.body.style.overflow = "hidden"
-      return () => { document.body.style.overflow = prev }
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = prev
+      }
     }
   }, [pickerOpen])
 
-  const inc = (side) => {
+  const inc = side => {
     if (side === 'left') dispatch(incLeft())
     else dispatch(incRight())
     playClick()
   }
-  const dec = (side) => {
+  const dec = side => {
     if (side === 'left') dispatch(decLeft())
     else dispatch(decRight())
     playClick()
@@ -170,21 +205,122 @@ export default function TrucoScore() {
 
   const clear = () => {
     dispatch(resetMatch())
+    setLoggedThisMatch(false)
   }
 
-  const confirmClear = () => {
-    toast(({ closeToast }) => (
-      <div style={{ padding: 8 }}>
-        <div>Clear match? This will reset names and scores.</div>
-        <div style={{ marginTop: 8 }}>
-          <button onClick={() => { dispatch(resetMatch()); closeToast(); }} style={{ background: 'var(--accent)', color: '#fff', border: 'none', padding: '6px 10px', borderRadius: 6 }}>Confirm</button>
-          <button className="toast-cancel" onClick={() => closeToast()}>Cancel</button>
+  const clearScores = () => {
+    dispatch(resetScores())
+    setLoggedThisMatch(false)
+  }
+
+  const confirmClear = callback => {
+    toast(
+      ({ closeToast }) => (
+        <div style={{ padding: 8 }}>
+          <div>Clear match? This will reset names and scores.</div>
+          <div style={{ marginTop: 8 }}>
+            <button
+              className="btn toast-confirm"
+              onClick={() => {
+                dispatch(resetMatch())
+                if (typeof callback === 'function') {
+                  callback()
+                }
+                closeToast()
+              }}
+            >
+              Confirm
+            </button>
+            <button className="btn toast-cancel" onClick={() => closeToast()}>
+              Cancel
+            </button>
+          </div>
         </div>
-      </div>
-    ), { autoClose: false, closeOnClick: false, draggable: false })
+      ),
+      { autoClose: false, closeOnClick: false, draggable: false },
+    )
   }
 
-  const selectAll = (e) => {
+  const confirmClearScores = callback => {
+    toast(
+      ({ closeToast }) => (
+        <div style={{ padding: 8 }}>
+          <div>Clear scores? Names and emojis will be preserved.</div>
+          <div style={{ marginTop: 8 }}>
+            <button
+              className="btn toast-confirm"
+              onClick={() => {
+                dispatch(resetScores())
+                setLoggedThisMatch(false)
+                if (typeof callback === 'function') {
+                  callback()
+                }
+                closeToast()
+              }}
+            >
+              Confirm
+            </button>
+            <button className="btn toast-cancel" onClick={() => closeToast()}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { autoClose: false, closeOnClick: false, draggable: false },
+    )
+  }
+
+  const handleLogResult = () => {
+    try {
+      const payload = {
+        leftName,
+        leftEmoji,
+        rightName,
+        rightEmoji,
+        leftScore,
+        rightScore,
+        matchType,
+        winner: winner === 'left' ? leftName : rightName,
+        timestamp: new Date().toISOString(),
+      }
+      dispatch(addLog(payload))
+      // clear scores but keep names/emojis
+      dispatch(resetScores())
+      setLoggedThisMatch(true)
+      toast('Result logged')
+    } catch (err) {
+      console.error('log result failed', err)
+      toast('Failed to log result')
+    }
+  }
+
+  const confirmLogResult = () => {
+    toast(
+      ({ closeToast }) => (
+        <div style={{ padding: 8 }}>
+          <div>Log result? This will save the match and clear the scores.</div>
+          <div style={{ marginTop: 8 }}>
+            <button
+              className="btn toast-confirm"
+              onClick={() => {
+                handleLogResult()
+                closeToast()
+                setShowWinner(false)
+              }}
+            >
+              Confirm
+            </button>
+            <button className="btn toast-cancel" onClick={() => closeToast()}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { autoClose: false, closeOnClick: false, draggable: false },
+    )
+  }
+
+  const selectAll = e => {
     try {
       e.target.select()
     } catch (err) {
@@ -192,99 +328,131 @@ export default function TrucoScore() {
     }
   }
 
-  const handleNameKeyDown = (e) => {
-    if (e.key === "Enter") {
+  const handleNameKeyDown = e => {
+    if (e.key === 'Enter') {
       e.preventDefault()
-      try { e.target.blur() } catch (err) {}
+      try {
+        e.target.blur()
+      } catch (err) {}
     }
   }
 
   return (
     <>
       <div className="truco-score">
-      <div className="match-type">
-        <label>
-          <input
-            type="radio"
-            name="match"
-            value="half"
-            checked={matchType === "half"}
-            onChange={() => dispatch(setMatchType("half"))}
-          />
-          Half (to 15)
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="match"
-            value="full"
-            checked={matchType === "full"}
-            onChange={() => dispatch(setMatchType("full"))}
-          />
-          Full (to 30)
-        </label>
-        <button style={{ marginLeft: 12 }} onClick={clear}>
-          Clear
-        </button>
-      </div>
-
-      <div className="board">
-        <div className="player left">
-          <div className="player-name-row">
+        <div className="match-type">
+          <label>
             <input
-              className="player-name"
-              value={leftName}
-              onChange={(e) => dispatch(setLeftName(e.target.value))}
-              onFocus={selectAll}
-              onClick={selectAll}
-              onContextMenu={(e) => e.preventDefault()}
-              onKeyDown={handleNameKeyDown}
+              type="radio"
+              name="match"
+              value="half"
+              checked={matchType === 'half'}
+              onChange={() => dispatch(setMatchType('half'))}
             />
-              <button className="emoji-profile" aria-label="Left player emoji" onClick={() => setPickerOpen('left')} type="button">
-                <span aria-hidden>{leftEmoji}</span>
-              </button>
-          </div>
-          <div className="points-divider" />
-          <div className="points">{leftScore}</div>
-          <div className="controls">
-            <button onClick={() => inc("left")}>+1</button>
-            <button onClick={() => dec("left")}>-1</button>
-          </div>
-        </div>
-
-        <div className="vertical-separator" />
-
-        <div className="player right">
-          <div className="player-name-row">
+            A 15
+          </label>
+          <label>
             <input
-              className="player-name"
-              value={rightName}
-              onChange={(e) => dispatch(setRightName(e.target.value))}
-              onFocus={selectAll}
-              onClick={selectAll}
-              onContextMenu={(e) => e.preventDefault()}
-              onKeyDown={handleNameKeyDown}
+              type="radio"
+              name="match"
+              value="full"
+              checked={matchType === 'full'}
+              onChange={() => dispatch(setMatchType('full'))}
             />
-            <button className="emoji-profile" aria-label="Right player emoji" onClick={() => setPickerOpen('right')} type="button">
-              <span aria-hidden>{rightEmoji}</span>
+            A 30
+          </label>
+          <div className="match-type-actions">
+            <button className="btn clear-btn" onClick={confirmClear}>
+              Clear
+            </button>
+            <button className="btn clear-btn" onClick={confirmClearScores}>
+              Clear scores
             </button>
           </div>
-          <div className="points-divider" />
-          <div className="points">{rightScore}</div>
-          <div className="controls">
-            <button onClick={() => inc("right")}>+1</button>
-            <button onClick={() => dec("right")}>-1</button>
+        </div>
+
+        <div className="board">
+          <div className="player left">
+            <div className="player-name-row">
+              <input
+                className="player-name"
+                value={leftName}
+                onChange={e => dispatch(setLeftName(e.target.value))}
+                onFocus={selectAll}
+                onClick={selectAll}
+                onContextMenu={e => e.preventDefault()}
+                onKeyDown={handleNameKeyDown}
+              />
+              <button
+                className="btn emoji-profile"
+                aria-label="Left player emoji"
+                onClick={() => setPickerOpen('left')}
+                type="button"
+              >
+                <span aria-hidden>{leftEmoji}</span>
+              </button>
+            </div>
+            <div className="points-divider" />
+            <div className="points">{leftScore}</div>
+            <div className="controls">
+              <button className="btn" onClick={() => inc('left')}>
+                +1
+              </button>
+              <button className="btn" onClick={() => dec('left')}>
+                -1
+              </button>
+            </div>
+          </div>
+
+          <div className="vertical-separator" />
+
+          <div className="player right">
+            <div className="player-name-row">
+              <input
+                className="player-name"
+                value={rightName}
+                onChange={e => dispatch(setRightName(e.target.value))}
+                onFocus={selectAll}
+                onClick={selectAll}
+                onContextMenu={e => e.preventDefault()}
+                onKeyDown={handleNameKeyDown}
+              />
+              <button
+                className="btn emoji-profile"
+                aria-label="Right player emoji"
+                onClick={() => setPickerOpen('right')}
+                type="button"
+              >
+                <span aria-hidden>{rightEmoji}</span>
+              </button>
+            </div>
+            <div className="points-divider" />
+            <div className="points">{rightScore}</div>
+            <div className="controls">
+              <button className="btn" onClick={() => inc('right')}>
+                +1
+              </button>
+              <button className="btn" onClick={() => dec('right')}>
+                -1
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="shortcuts" style={{ marginTop: 10, color: 'var(--muted)', fontSize: '0.9rem' }}>
-        Shortcuts: Q/A left +/-, P/L right +/-, H/F half/full, C clear, T toggle theme
-      </div>
+        <div
+          className="shortcuts"
+          style={{ marginTop: 10, color: 'var(--muted)', fontSize: '0.9rem' }}
+        >
+          Shortcuts: Q/A left +/-, P/L right +/-, H/F half/full, C clear, T
+          toggle theme
+        </div>
       </div>
       <EmojiPickerOverlay
         openFor={pickerOpen}
         onClose={() => setPickerOpen(null)}
-          onChoose={(side, em) => { if (side === 'left') dispatch(setLeftEmoji(em)); else dispatch(setRightEmoji(em)) }}
+        onChoose={(side, em) => {
+          if (side === 'left') dispatch(setLeftEmoji(em))
+          else dispatch(setRightEmoji(em))
+        }}
       />
 
       <WinnerOverlay
@@ -292,8 +460,18 @@ export default function TrucoScore() {
         winner={winner}
         winnerName={winner === 'left' ? leftName : rightName}
         winnerEmoji={winner === 'left' ? leftEmoji : rightEmoji}
-        onClose={() => { setShowWinner(false); setWinnerAcknowledged(true) }}
-        onReset={() => { setShowWinner(false); setWinnerAcknowledged(true); clear(); }}
+        onClose={() => {
+          setShowWinner(false)
+          setWinnerAcknowledged(true)
+        }}
+        onClear={() => {
+          confirmClearScores(() => {
+            setShowWinner(false)
+            setWinnerAcknowledged(true)
+          })
+        }}
+        onLog={() => confirmLogResult()}
+        logged={loggedThisMatch}
       />
     </>
   )
@@ -303,15 +481,23 @@ export default function TrucoScore() {
 export function EmojiPickerOverlay({ openFor, onClose, onChoose }) {
   if (!openFor) return null
   return (
-    <div className="emoji-overlay" role="dialog" aria-modal="true" onClick={onClose}>
+    <div
+      className="emoji-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
       <div className="emoji-overlay-backdrop" />
       <div className="emoji-overlay-content">
         <div className="emoji-grid">
-          {EMOJIS.map((em) => (
+          {EMOJIS.map(em => (
             <button
               key={em}
-              className="emoji-btn"
-              onClick={() => { onChoose(openFor, em); onClose() }}
+              className="btn emoji-btn"
+              onClick={() => {
+                onChoose(openFor, em)
+                onClose()
+              }}
               aria-label={`Choose ${em}`}
             >
               {em}
@@ -323,10 +509,26 @@ export function EmojiPickerOverlay({ openFor, onClose, onChoose }) {
   )
 }
 
-export function WinnerOverlay({ show, winner, winnerName, winnerEmoji, onClose, onReset }) {
+export function WinnerOverlay({
+  show,
+  winner,
+  winnerName,
+  winnerEmoji,
+  onClose,
+  onClear,
+  onLog,
+  logged,
+}) {
   if (!show) return null
 
-  const colors = ["#F97316", "#60A5FA", "#FB7185", "#34D399", "#F59E0B", "#A78BFA"]
+  const colors = [
+    '#F97316',
+    '#60A5FA',
+    '#FB7185',
+    '#34D399',
+    '#F59E0B',
+    '#A78BFA',
+  ]
   const pieces = Array.from({ length: 40 }).map((_, i) => {
     const left = Math.random() * 100
     const delay = Math.random() * 0.6
@@ -336,27 +538,56 @@ export function WinnerOverlay({ show, winner, winnerName, winnerEmoji, onClose, 
       <div
         key={i}
         className="confetti-piece"
-        style={{ left: `${left}%`, background: bg, animationDelay: `${delay}s`, transform: `rotate(${rotate}deg)` }}
+        style={{
+          left: `${left}%`,
+          background: bg,
+          animationDelay: `${delay}s`,
+          transform: `rotate(${rotate}deg)`,
+        }}
       />
     )
   })
 
   return (
-    <div className="winner-overlay" role="status" aria-live="polite" onClick={onClose}>
-      <div className="winner-backdrop" />
+    <div className="winner-overlay" role="status" aria-live="polite">
+      <div className="tada">{pieces}</div>
       <div className="winner-content">
-        <div className="winner-card tada">
+        <div className="winner-card">
+          <button
+            className="btn winner-close-x"
+            aria-label="Close"
+            type="button"
+            onClick={onClose}
+          >
+            ✕
+          </button>
           <div className="winner-emoji">{winnerEmoji}</div>
           <div className="winner-text">{winnerName} wins!</div>
-          <div style={{ marginTop: 12 }}>
-            <button className="winner-close-btn" onClick={() => { if (onReset) onReset(); else onClose(); }}>
-              Close & Reset
+          <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+            {typeof onLog === 'function' && (
+              <button
+                className="btn winner-close-btn winner-log-btn"
+                onClick={e => {
+                  onLog()
+                }}
+                disabled={!!logged}
+              >
+                {logged ? 'Logged' : 'Log result'}
+              </button>
+            )}
+            <button
+              className="btn winner-close-btn"
+              onClick={() => {
+                if (onClear) onClear()
+                else onClose()
+              }}
+            >
+              Close & Clear Scores
             </button>
           </div>
         </div>
-        {pieces}
       </div>
+      <div className="winner-backdrop" />
     </div>
   )
 }
-
