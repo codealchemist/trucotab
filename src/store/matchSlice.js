@@ -40,12 +40,18 @@ const slice = createSlice({
       state.leftScore = 0
       state.rightScore = 0
     }
+    ,
+    resetScores(state) {
+      state.leftScore = 0
+      state.rightScore = 0
+    }
   }
 })
 
 export const {
   setLeftName, setRightName, setLeftEmoji, setRightEmoji, setMatchType,
   setLeftScore, setRightScore, incLeft, decLeft, incRight, decRight, resetMatch
+  , resetScores
 } = slice.actions
 export default slice.reducer
 
