@@ -5,6 +5,7 @@ import Root from "./routes/root"
 import Home from "./routes/home"
 import About from "./routes/about"
 import JsExample from "./routes/js-example"
+import Settings from "./routes/settings"
 import "./styles.css"
 
 const router = createBrowserRouter([
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       },
       { path: "about", element: <About /> },
       { path: "js", element: <JsExample /> },
+      { path: "settings", element: <Settings /> },
     ],
   },
 ])

@@ -81,6 +81,13 @@ export default function Root() {
           >
             About
           </NavLink>
+          <NavLink
+            to="/settings"
+            className={({ isActive }) => "menu-item" + (isActive ? " active" : "")}
+            onClick={() => setMenuOpen(false)}
+          >
+            Settings
+          </NavLink>
         </nav>
       </aside>
 
