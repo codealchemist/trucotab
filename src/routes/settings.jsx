@@ -1,25 +1,10 @@
-import React, { useEffect, useState } from "react"
-
-const STORAGE_KEY = "trucotab.settings"
+import React from "react"
+import { useSelector, useDispatch } from 'react-redux'
+import { setSoundEnabled } from '../store/settingsSlice'
 
 export default function Settings() {
-  const [soundEnabled, setSoundEnabled] = useState(true)
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (typeof parsed.soundEnabled === "boolean") setSoundEnabled(parsed.soundEnabled)
-      }
-    } catch (e) {}
-  }, [])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ soundEnabled }))
-    } catch (e) {}
-  }, [soundEnabled])
+  const dispatch = useDispatch()
+  const soundEnabled = useSelector(s => s.settings.soundEnabled)
 
   return (
     <section>
@@ -29,7 +14,7 @@ export default function Settings() {
           <input
             type="checkbox"
             checked={soundEnabled}
-            onChange={(e) => setSoundEnabled(e.target.checked)}
+            onChange={(e) => dispatch(setSoundEnabled(e.target.checked))}
           />
           <span>Enable sound effects</span>
         </label>

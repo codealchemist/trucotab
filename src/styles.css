@@ -153,6 +153,10 @@ section h2 { display:none }
 .winner-close-btn { margin-top: 6px; padding:8px 14px; border-radius:8px; border:1px solid transparent; background: var(--danger); color: #fff; cursor:pointer }
 .winner-close-btn:hover { filter: brightness(0.95); }
 
+/* Toast cancel button - uses CSS variables so it follows the app theme */
+.toast-cancel { margin-left: 8px; padding: 6px 10px; border-radius: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--divider); cursor: pointer }
+.toast-cancel:hover { filter: brightness(0.98); }
+
 /* Version styling on About page */
 .version-pill { display:inline-block; border-radius:999px; color: var(--accent); font-weight:600; font-size:0.92rem }
 

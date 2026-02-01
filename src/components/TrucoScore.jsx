@@ -1,18 +1,26 @@
 import React, { useState, useEffect, useRef } from "react"
-
-const STORAGE_KEY = "trucotab.match"
+import { useSelector, useDispatch } from 'react-redux'
+import { toast } from 'react-toastify'
+import {
+  setLeftName, setRightName, setLeftEmoji, setRightEmoji,
+  setMatchType, setLeftScore, setRightScore, incLeft, decLeft, incRight, decRight, resetMatch,
+  selectMatch, selectMaxScore
+} from '../store/matchSlice'
 
 const EMOJIS = ["🂠", "😀", "😎", "🃏", "🎉", "🥇", "🔥"]
 
 export default function TrucoScore() {
-  const [leftName, setLeftName] = useState("Player A")
-  const [leftEmoji, setLeftEmoji] = useState("🂠")
-  const [rightName, setRightName] = useState("Player B")
-  const [rightEmoji, setRightEmoji] = useState("🂠")
-  const [matchType, setMatchType] = useState("half") // 'half' -> 15, 'full' -> 30
-  const maxScore = matchType === "half" ? 15 : 30
-  const [leftScore, setLeftScore] = useState(0)
-  const [rightScore, setRightScore] = useState(0)
+  const dispatch = useDispatch()
+  const match = useSelector(selectMatch)
+  const leftName = match.leftName
+  const leftEmoji = match.leftEmoji
+  const rightName = match.rightName
+  const rightEmoji = match.rightEmoji
+  const matchType = match.matchType
+  const leftScore = match.leftScore
+  const rightScore = match.rightScore
+  const maxScore = useSelector(selectMaxScore)
+  const rehydrated = useSelector(s => s._persist && s._persist.rehydrated)
   const [pickerOpen, setPickerOpen] = useState(null) // 'left' | 'right' | null
   const [showWinner, setShowWinner] = useState(false)
   const [winner, setWinner] = useState(null)
@@ -21,6 +29,7 @@ export default function TrucoScore() {
   const audioCtxRef = useRef(null)
 
   useEffect(() => {
+    console.log('RENDER TRUCO')
     try {
       const Ctx = window.AudioContext || window.webkitAudioContext
       if (Ctx) audioCtxRef.current = new Ctx()
@@ -34,16 +43,8 @@ export default function TrucoScore() {
     }
   }, [])
 
-  const isSoundEnabled = () => {
-    try {
-      const raw = localStorage.getItem("trucotab.settings")
-      if (!raw) return false
-      const parsed = JSON.parse(raw)
-      return Boolean(parsed.soundEnabled)
-    } catch (e) {
-      return false
-    }
-  }
+  const soundEnabled = useSelector(s => s.settings.soundEnabled)
+  const theme = useSelector(s => s.settings.theme)
 
   const playTone = (freq, when = 0, dur = 0.12, type = "sine") => {
     const ctx = audioCtxRef.current
@@ -66,60 +67,15 @@ export default function TrucoScore() {
     }
   }
 
-  const playClick = () => {
-    if (!isSoundEnabled()) return
-    playTone(1000, 0, 0.08, "square")
-  }
+  const playClick = () => { if (soundEnabled) playTone(1000, 0, 0.08, 'square') }
+  const playWin = () => { if (soundEnabled) { playTone(660,0,0.14,'sine'); playTone(880,0.12,0.16,'sine'); playTone(990,0.28,0.22,'sine') } }
 
-  const playWin = () => {
-    if (!isSoundEnabled()) return
-    playTone(660, 0, 0.14, "sine")
-    playTone(880, 0.12, 0.16, "sine")
-    playTone(990, 0.28, 0.22, "sine")
-  }
-
-  // load from localStorage on mount
+  // When matchType changes ensure stored scores are clamped to new max
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (parsed.leftName) setLeftName(parsed.leftName)
-        if (parsed.leftEmoji) setLeftEmoji(parsed.leftEmoji)
-        if (parsed.rightName) setRightName(parsed.rightName)
-        if (parsed.rightEmoji) setRightEmoji(parsed.rightEmoji)
-        if (parsed.matchType) setMatchType(parsed.matchType)
-        if (typeof parsed.leftScore === "number") setLeftScore(parsed.leftScore)
-        if (typeof parsed.rightScore === "number") setRightScore(parsed.rightScore)
-      }
-    } catch (e) {
-      // ignore parse errors
-    }
-  }, [])
-
-  // persist to localStorage whenever relevant state changes
-  useEffect(() => {
-    const payload = {
-      leftName,
-      leftEmoji,
-      rightName,
-      rightEmoji,
-      matchType,
-      leftScore,
-      rightScore,
-    }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-    } catch (e) {
-      // ignore storage errors
-    }
-  }, [leftName, leftEmoji, rightName, rightEmoji, matchType, leftScore, rightScore])
-
-  useEffect(() => {
-    // clamp scores if max changes
-    setLeftScore((s) => Math.min(Math.max(0, s), maxScore))
-    setRightScore((s) => Math.min(Math.max(0, s), maxScore))
-  }, [matchType])
+    const clamp = (v) => Math.min(Math.max(0, v), maxScore)
+    if (leftScore !== clamp(leftScore)) dispatch(setLeftScore(clamp(leftScore)))
+    if (rightScore !== clamp(rightScore)) dispatch(setRightScore(clamp(rightScore)))
+  }, [matchType, leftScore, rightScore, dispatch])
 
   // show winner overlay when someone reaches maxScore
   useEffect(() => {
@@ -145,9 +101,13 @@ export default function TrucoScore() {
   // keyboard shortcuts
   useEffect(() => {
     const onKey = (e) => {
+      // ignore shortcut handling until persistence finished rehydration
+      if (!rehydrated) return
       const tag = e.target && e.target.tagName
       if (tag === "INPUT" || e.target.isContentEditable) return
       const k = e.key.toLowerCase()
+      // don't trigger clear on Ctrl/C / Cmd/C (copy) or other modifiers
+      if (k === 'c' && (e.ctrlKey || e.metaKey)) return
       switch (k) {
         case "q":
           inc("left")
@@ -161,14 +121,14 @@ export default function TrucoScore() {
         case "l":
           dec("right")
           break
-        case "r":
-          reset()
-          break
+          case "c":
+            confirmClear()
+            break
         case "h":
-          setMatchType("half")
+          dispatch(setMatchType("half"))
           break
         case "f":
-          setMatchType("full")
+          dispatch(setMatchType("full"))
           break
         default:
           break
@@ -176,7 +136,7 @@ export default function TrucoScore() {
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [leftScore, rightScore, matchType])
+  }, [leftScore, rightScore, matchType, rehydrated])
 
   // close emoji picker on Escape
   useEffect(() => {
@@ -198,27 +158,30 @@ export default function TrucoScore() {
   }, [pickerOpen])
 
   const inc = (side) => {
-    if (side === "left") setLeftScore((s) => Math.min(s + 1, maxScore))
-    else setRightScore((s) => Math.min(s + 1, maxScore))
+    if (side === 'left') dispatch(incLeft())
+    else dispatch(incRight())
     playClick()
   }
   const dec = (side) => {
-    if (side === "left") setLeftScore((s) => Math.max(s - 1, 0))
-    else setRightScore((s) => Math.max(s - 1, 0))
+    if (side === 'left') dispatch(decLeft())
+    else dispatch(decRight())
     playClick()
   }
 
-  const reset = () => {
-    setLeftName("Player A")
-    setLeftEmoji("🂠")
-    setRightName("Player B")
-    setRightEmoji("🂠")
-    setMatchType("half")
-    setLeftScore(0)
-    setRightScore(0)
-    try {
-      localStorage.removeItem(STORAGE_KEY)
-    } catch (e) {}
+  const clear = () => {
+    dispatch(resetMatch())
+  }
+
+  const confirmClear = () => {
+    toast(({ closeToast }) => (
+      <div style={{ padding: 8 }}>
+        <div>Clear match? This will reset names and scores.</div>
+        <div style={{ marginTop: 8 }}>
+          <button onClick={() => { dispatch(resetMatch()); closeToast(); }} style={{ background: 'var(--accent)', color: '#fff', border: 'none', padding: '6px 10px', borderRadius: 6 }}>Confirm</button>
+          <button className="toast-cancel" onClick={() => closeToast()}>Cancel</button>
+        </div>
+      </div>
+    ), { autoClose: false, closeOnClick: false, draggable: false })
   }
 
   const selectAll = (e) => {
@@ -246,7 +209,7 @@ export default function TrucoScore() {
             name="match"
             value="half"
             checked={matchType === "half"}
-            onChange={() => setMatchType("half")}
+            onChange={() => dispatch(setMatchType("half"))}
           />
           Half (to 15)
         </label>
@@ -256,12 +219,12 @@ export default function TrucoScore() {
             name="match"
             value="full"
             checked={matchType === "full"}
-            onChange={() => setMatchType("full")}
+            onChange={() => dispatch(setMatchType("full"))}
           />
           Full (to 30)
         </label>
-        <button style={{ marginLeft: 12 }} onClick={reset}>
-          Reset
+        <button style={{ marginLeft: 12 }} onClick={clear}>
+          Clear
         </button>
       </div>
 
@@ -271,18 +234,13 @@ export default function TrucoScore() {
             <input
               className="player-name"
               value={leftName}
-              onChange={(e) => setLeftName(e.target.value)}
+              onChange={(e) => dispatch(setLeftName(e.target.value))}
               onFocus={selectAll}
               onClick={selectAll}
               onContextMenu={(e) => e.preventDefault()}
               onKeyDown={handleNameKeyDown}
             />
-              <button
-                className="emoji-profile"
-                aria-label="Left player emoji"
-                onClick={() => setPickerOpen("left")}
-                type="button"
-              >
+              <button className="emoji-profile" aria-label="Left player emoji" onClick={() => setPickerOpen('left')} type="button">
                 <span aria-hidden>{leftEmoji}</span>
               </button>
           </div>
@@ -301,18 +259,13 @@ export default function TrucoScore() {
             <input
               className="player-name"
               value={rightName}
-              onChange={(e) => setRightName(e.target.value)}
+              onChange={(e) => dispatch(setRightName(e.target.value))}
               onFocus={selectAll}
               onClick={selectAll}
               onContextMenu={(e) => e.preventDefault()}
               onKeyDown={handleNameKeyDown}
             />
-            <button
-              className="emoji-profile"
-              aria-label="Right player emoji"
-              onClick={() => setPickerOpen("right")}
-              type="button"
-            >
+            <button className="emoji-profile" aria-label="Right player emoji" onClick={() => setPickerOpen('right')} type="button">
               <span aria-hidden>{rightEmoji}</span>
             </button>
           </div>
@@ -325,13 +278,13 @@ export default function TrucoScore() {
         </div>
       </div>
       <div className="shortcuts" style={{ marginTop: 10, color: 'var(--muted)', fontSize: '0.9rem' }}>
-        Shortcuts: Q/A left +/-, P/L right +/-, H/F half/full, R reset, T toggle theme
+        Shortcuts: Q/A left +/-, P/L right +/-, H/F half/full, C clear, T toggle theme
       </div>
       </div>
       <EmojiPickerOverlay
         openFor={pickerOpen}
         onClose={() => setPickerOpen(null)}
-        onChoose={(side, em) => { if (side === 'left') setLeftEmoji(em); else setRightEmoji(em) }}
+          onChoose={(side, em) => { if (side === 'left') dispatch(setLeftEmoji(em)); else dispatch(setRightEmoji(em)) }}
       />
 
       <WinnerOverlay
@@ -340,7 +293,7 @@ export default function TrucoScore() {
         winnerName={winner === 'left' ? leftName : rightName}
         winnerEmoji={winner === 'left' ? leftEmoji : rightEmoji}
         onClose={() => { setShowWinner(false); setWinnerAcknowledged(true) }}
-        onReset={() => { setShowWinner(false); setWinnerAcknowledged(true); reset(); }}
+        onReset={() => { setShowWinner(false); setWinnerAcknowledged(true); clear(); }}
       />
     </>
   )
