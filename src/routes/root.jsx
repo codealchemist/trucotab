@@ -1,6 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import pkg from '../../package.json'
 import { setTheme, setLanguage } from '../store/settingsSlice'
 import { useTranslation } from '../i18n/useTranslation'
 import { QRCodeSVG } from 'qrcode.react'
@@ -293,6 +294,10 @@ export default function Root() {
       <main>
         <Outlet />
       </main>
+
+      <footer className='site-footer'>
+        TrucoTab <span className='version-pill'>v{pkg.version}</span>
+      </footer>
     </div>
   )
 }
