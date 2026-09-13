@@ -165,7 +165,7 @@ export default function Root() {
             title='Language / Idioma'
             onClick={() => dispatch(setLanguage(lang === 'es' ? 'en' : 'es'))}
           >
-            {lang === 'es' ? '🇪🇸 ES' : '🇬🇧 EN'}
+            {lang === 'es' ? '🇪🇸' : '🇬🇧'}
           </button>
           <button
             className='btn header-btn'
@@ -237,6 +237,10 @@ export default function Root() {
             {t('navLeaderboard')}
           </NavLink>
         </nav>
+
+        <div className='side-pane-footer'>
+          TrucoTab <span className='version-pill'>v{pkg.version}</span>
+        </div>
       </aside>
 
       {/* Backdrop for mobile when menuOpen */}
@@ -294,10 +298,6 @@ export default function Root() {
       <main>
         <Outlet />
       </main>
-
-      <footer className='site-footer'>
-        TrucoTab <span className='version-pill'>v{pkg.version}</span>
-      </footer>
     </div>
   )
 }

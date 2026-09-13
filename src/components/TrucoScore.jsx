@@ -20,7 +20,7 @@ import {
 import { resetScores } from '../store/matchSlice'
 import { addLog } from '../store/logSlice'
 import { useTranslation } from '../i18n/useTranslation'
-import { X } from 'lucide-react'
+import { X, RotateCcw, Eraser, FileText } from 'lucide-react'
 
 const EMOJIS = ['🂠', '😀', '😎', '🃏', '🎉', '🥇', '🔥']
 
@@ -344,32 +344,46 @@ export default function TrucoScore() {
     <>
       <div className='truco-score'>
         <div className='match-type'>
-          <label>
-            <input
-              type='radio'
-              name='match'
-              value='half'
-              checked={matchType === 'half'}
-              onChange={() => dispatch(setMatchType('half'))}
-            />
-            {t('to15')}
-          </label>
-          <label>
-            <input
-              type='radio'
-              name='match'
-              value='full'
-              checked={matchType === 'full'}
-              onChange={() => dispatch(setMatchType('full'))}
-            />
-            {t('to30')}
-          </label>
-          <div className='match-type-actions'>
-            <button className='btn clear-btn' onClick={confirmClear}>
-              {t('resetMatch')}
+          <div
+            className='match-type-switch'
+            role='radiogroup'
+            aria-label={t('matchType')}
+          >
+            <button
+              type='button'
+              role='radio'
+              aria-checked={matchType === 'half'}
+              className={`switch-btn ${matchType === 'half' ? 'active' : ''}`}
+              onClick={() => dispatch(setMatchType('half'))}
+            >
+              {t('to15')}
             </button>
-            <button className='btn clear-btn' onClick={confirmClearScores}>
-              {t('clearScores')}
+            <button
+              type='button'
+              role='radio'
+              aria-checked={matchType === 'full'}
+              className={`switch-btn ${matchType === 'full' ? 'active' : ''}`}
+              onClick={() => dispatch(setMatchType('full'))}
+            >
+              {t('to30')}
+            </button>
+          </div>
+          <div className='match-type-actions'>
+            <button
+              className='btn clear-btn'
+              onClick={confirmClear}
+              title={t('resetMatch')}
+              aria-label={t('resetMatch')}
+            >
+              <RotateCcw size={18} />
+            </button>
+            <button
+              className='btn clear-btn'
+              onClick={confirmClearScores}
+              title={t('clearScores')}
+              aria-label={t('clearScores')}
+            >
+              <Eraser size={18} />
             </button>
           </div>
         </div>
@@ -583,7 +597,8 @@ export function WinnerOverlay({
                 }}
                 disabled={!!logged}
               >
-                {logged ? t('logged') : t('logResult')}
+                <FileText size={16} />
+                <span>{logged ? t('logged') : t('logResult')}</span>
               </button>
             )}
             <button
@@ -593,7 +608,8 @@ export function WinnerOverlay({
                 else onClose()
               }}
             >
-              {t('closeAndClear')}
+              <RotateCcw size={16} />
+              <span>{t('closeAndClear')}</span>
             </button>
           </div>
         </div>

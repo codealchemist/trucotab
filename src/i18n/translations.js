@@ -33,7 +33,7 @@ export const translations = {
     closeAndClear: 'Cerrar y reiniciar puntos',
     clearScoresConfirm: '¿Estás seguro de que quieres reiniciar los puntos?',
     resetMatchConfirm:
-      '¿Estás seguro de que quieres reiniciar todo el partido?',
+      '¿Estás seguro de que quieres reiniciar todo el partido? Los nombres y emojis de los jugadores se restablecerán a los valores predeterminados.',
     matchLoggedToast: '¡Resultado registrado!',
     confirm: 'Confirmar',
     cancel: 'Cancelar',
@@ -124,7 +124,8 @@ export const translations = {
     logged: 'Logged',
     closeAndClear: 'Close & Clear Scores',
     clearScoresConfirm: 'Are you sure you want to clear scores?',
-    resetMatchConfirm: 'Are you sure you want to reset the entire match?',
+    resetMatchConfirm:
+      'Are you sure you want to reset the entire match? Player names and emojis will be reset to default.',
     matchLoggedToast: 'Match logged!',
     confirm: 'Confirm',
     cancel: 'Cancel',
