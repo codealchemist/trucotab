@@ -54,10 +54,10 @@ export default function Log() {
             <button
               onClick={confirmClearLog}
               className='btn clear-btn'
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+              title={t('clearLog')}
+              aria-label={t('clearLog')}
             >
-              <Trash2 size={14} />
-              {t('clearLog')}
+              <Trash2 size={18} />
             </button>
           </div>
         </div>

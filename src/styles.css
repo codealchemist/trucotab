@@ -92,15 +92,6 @@ main {
   padding: 18px;
 }
 
-.site-footer {
-  padding: 14px 18px;
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--muted);
-  border-top: 1px solid var(--divider);
-  margin-top: auto;
-}
-
 .theme-toggle {
   margin-left: 12px;
   width: 75px;
@@ -135,11 +126,22 @@ main {
   background: var(--surface);
   padding: 24px;
   box-shadow: 6px 0 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
 }
 .side-nav {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
+}
+.side-pane-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-top: 1px solid var(--divider);
 }
 .menu-item {
   display: flex;
@@ -319,7 +321,7 @@ section h2 {
   .app {
     display: grid;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     height: 100vh;
     height: 100dvh;
   }
@@ -344,14 +346,9 @@ section h2 {
     grid-row: 2;
     overflow-y: auto;
   }
-
-  .site-footer {
-    grid-column: 2;
-    grid-row: 3;
-  }
 }
 
-/* TrucoScore styles (dark) */
+/* TrucoScore styles */
 .truco-score {
   margin-top: 20px;
 }
@@ -361,36 +358,55 @@ section h2 {
   margin-bottom: 12px;
   align-items: center;
 }
-.match-type label {
-  color: var(--muted);
+.match-type-switch {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--surface);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  gap: 2px;
+  box-shadow: var(--panel-shadow);
 }
-.match-type input {
-  margin-right: 6px;
-}
-.match-type button {
+.switch-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
   background: transparent;
   color: var(--muted);
-  border: 1px solid var(--divider);
-  padding: 6px 10px;
-  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+.switch-btn:hover {
+  color: var(--text);
+}
+.switch-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Unified clear button style used across views */
 .clear-btn {
   padding: 6px;
-  width: 75px;
-  height: 50px;
-  text-align: center;
-  display: inline-block;
-  border-radius: 6px;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   border: 1px solid var(--divider);
   background: transparent;
   color: var(--text);
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 .clear-btn:hover {
   background: var(--row-hover);
+  border-color: var(--muted);
 }
 
 /* Align the group of match-type actions (clear buttons) to the right */
@@ -668,11 +684,17 @@ section h2 {
 .winner-close-btn {
   margin-top: 6px;
   padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: var(--danger);
   color: #fff;
   cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 .winner-close-btn:hover {
   filter: brightness(0.95);
@@ -1045,7 +1067,7 @@ section h2 {
   border: 1px solid var(--divider);
   background: var(--surface);
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   font-weight: 500;
   cursor: pointer;
   transition:
