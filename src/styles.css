@@ -718,9 +718,11 @@ section h2 {
 /* Toast cancel button - uses CSS variables so it follows the app theme */
 .toast-cancel {
   margin-left: 8px;
-  padding: 10px 14px;
+  padding: 10px 16px;
   height: 44px;
-  width: 80px;
+  width: auto;
+  min-width: 90px;
+  white-space: nowrap;
   border-radius: 8px;
   background: var(--surface);
   color: var(--text);
@@ -739,12 +741,17 @@ section h2 {
   background: var(--danger);
   color: #fff;
   border: none;
-  padding: 10px 14px;
+  padding: 10px 16px;
   border-radius: 8px;
   height: 44px;
-  width: 80px;
+  width: auto;
+  min-width: 90px;
+  white-space: nowrap;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Base button styles used across the app. Add modifier classes for variants. */
@@ -1167,13 +1174,104 @@ section h2 {
 
 /* small screens */
 @media (max-width: 720px) {
-  .board {
+  .site-header,
+  main {
+    padding: 10px 12px;
+  }
+
+  main {
+    display: flex;
     flex-direction: column;
   }
+
+  main > section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  main > section > p {
+    margin: 0 0 6px 0;
+  }
+
+  .truco-score {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    margin-top: 0;
+  }
+
+  .match-type {
+    margin-bottom: 8px;
+  }
+
+  .board {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+  }
+
   .vertical-separator {
     display: none;
   }
+
   .player {
+    flex: 1;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    min-height: 0;
+  }
+
+  .player-name-row {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .player-name {
+    width: auto;
+    max-width: 150px;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .points-divider {
+    margin: 4px 0;
+  }
+
+  .points {
+    font-size: clamp(3.2rem, 11vh, 5.5rem);
+    line-height: 1;
+    margin: 2px 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .controls {
+    gap: 12px;
+  }
+
+  .controls button {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .shortcuts {
+    display: none;
   }
 }
