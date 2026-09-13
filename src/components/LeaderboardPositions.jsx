@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { selectLog } from '../store/logSlice'
+import { useTranslation } from '../i18n/useTranslation'
+import { Trophy, X } from 'lucide-react'
 
 export default function LeaderboardPositions() {
   const entries = useSelector(s => selectLog(s))
+  const { t } = useTranslation()
 
   // aggregate stats per player
   const map = new Map()
@@ -19,7 +22,7 @@ export default function LeaderboardPositions() {
         played: 0,
         won: 0,
         lost: 0,
-        emoji: '🂠',
+        emoji: '🂠'
       })
     return map.get(name)
   }
@@ -55,13 +58,13 @@ export default function LeaderboardPositions() {
   if (rows.length === 0) {
     return (
       <section>
-        <h2>Leaderboard</h2>
-        <div className="empty-positions">
-          <div className="empty-emoji">🎯</div>
-          <div className="empty-title">No matches logged yet</div>
-          <div className="empty-sub">
-            Play a match and use "Log result" to add entries here.
+        <h2>{t('leaderboardTitle')}</h2>
+        <div className='empty-positions'>
+          <div className='empty-emoji'>
+            <Trophy size={48} strokeWidth={1.5} color='var(--muted)' />
           </div>
+          <div className='empty-title'>{t('noLeaderboardData')}</div>
+          <div className='empty-sub'>{t('noLeaderboardDataSub')}</div>
         </div>
       </section>
     )
@@ -69,42 +72,42 @@ export default function LeaderboardPositions() {
 
   return (
     <section>
-      <h2>Leaderboard</h2>
+      <h2>{t('leaderboardTitle')}</h2>
       <div style={{ marginBottom: 12, color: 'var(--muted)' }}>
-        {rows.length} players
+        {rows.length} {t('playersCount')}
       </div>
-      <div className="positions-grid-wrapper">
-        <div className="positions-grid">
-          <div className="positions-grid-head">
+      <div className='positions-grid-wrapper'>
+        <div className='positions-grid'>
+          <div className='positions-grid-head'>
             <div></div>
-            <div>Player</div>
-            <div style={{ textAlign: 'center' }}>Victories</div>
+            <div>{t('player')}</div>
+            <div style={{ textAlign: 'center' }}>{t('victories')}</div>
           </div>
           {rows.map(r => (
             <button
               key={r.name}
-              className="positions-row"
+              className='positions-row'
               onClick={() => openPlayer(r)}
-              type="button"
+              type='button'
             >
-              <div className="cell-emoji">{r.emoji || '🂠'}</div>
-              <div className="cell-name">{r.name}</div>
-              <div className="cell-points">{r.won}</div>
+              <div className='cell-emoji'>{r.emoji || '🂠'}</div>
+              <div className='cell-name'>{r.name}</div>
+              <div className='cell-points'>{r.won}</div>
             </button>
           ))}
         </div>
       </div>
       {selected && (
-        <div className="player-modal" role="dialog" aria-modal="true">
-          <div className="modal-backdrop" onClick={() => setSelected(null)} />
-          <div className="modal-content">
+        <div className='player-modal' role='dialog' aria-modal='true'>
+          <div className='modal-backdrop' onClick={() => setSelected(null)} />
+          <div className='modal-content'>
             <button
               onClick={() => setSelected(null)}
-              className="btn modal-close-x"
-              aria-label="Close"
-              type="button"
+              className='btn modal-close-x'
+              aria-label='Close'
+              type='button'
             >
-              ✕
+              <X size={20} />
             </button>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               <div style={{ fontSize: '2rem' }}>{selected.emoji || '🂠'}</div>
@@ -113,11 +116,17 @@ export default function LeaderboardPositions() {
               </div>
             </div>
             <div style={{ marginTop: 12 }}>
-              <div>Matches: {selected.played}</div>
-              <div>Won: {selected.won}</div>
-              <div>Lost: {selected.lost}</div>
               <div>
-                Win rate:{' '}
+                {t('played')}: {selected.played}
+              </div>
+              <div>
+                {t('won')}: {selected.won}
+              </div>
+              <div>
+                {t('lost')}: {selected.lost}
+              </div>
+              <div>
+                {t('winRate')}:{' '}
                 {selected.played
                   ? `${Math.round((selected.won / selected.played) * 100)}%`
                   : '-'}

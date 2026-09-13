@@ -1,11 +1,11 @@
-import { useLoaderData } from "react-router-dom"
-import TrucoScore from "../components/TrucoScore"
+import TrucoScore from '../components/TrucoScore'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function Home() {
-  const data = useLoaderData()
+  const { t } = useTranslation()
   return (
     <section>
-      <p>{data?.message}</p>
+      <p>{t('welcome')}</p>
       <TrucoScore />
     </section>
   )

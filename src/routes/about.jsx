@@ -1,18 +1,21 @@
-import pkg from "../../package.json"
+import pkg from '../../package.json'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function About() {
+  const { t } = useTranslation()
   return (
     <section>
-      <p>Hola! Estás usando TrucoTab <span className="version-pill">v{pkg.version}</span>.</p>
-      <p>Un marcador de truco open source por siempre gratuito y sin publicidad 💪</p>
-      <p>Porque lo que importa es jugar al truco y que no te rompan las bolas!</p>
+      <p>
+        {t('aboutText1')} <span className='version-pill'>v{pkg.version}</span>.
+      </p>
+      <p>{t('aboutText2')}</p>
+      <p>{t('aboutText3')}</p>
       <br />
-      <p>A disfrutar con amigos! Chau!</p>
+      <p>{t('aboutText4')}</p>
       <p>--</p>
       <p>
-        Bert <a href="mailto:b3rt.js@gmail.com">b3rt.js@gmail.com</a>
+        Bert <a href='mailto:b3rt.js@gmail.com'>b3rt.js@gmail.com</a>
       </p>
     </section>
   )
 }
- 

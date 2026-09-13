@@ -2,98 +2,108 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import { selectLog, clearLog } from '../store/logSlice'
+import { useTranslation } from '../i18n/useTranslation'
+import { ClipboardList, Trash2 } from 'lucide-react'
 
 export default function Log() {
   const dispatch = useDispatch()
   const entries = useSelector(s => selectLog(s))
+  const { t } = useTranslation()
 
   const confirmClearLog = () => {
     toast(
       ({ closeToast }) => (
         <div style={{ padding: 8 }}>
-          <div>Clear log? This will remove all saved entries.</div>
+          <div>{t('clearLogConfirm')}</div>
           <div style={{ marginTop: 8 }}>
             <button
-              className="btn toast-confirm"
+              className='btn toast-confirm'
               onClick={() => {
                 dispatch(clearLog())
                 closeToast()
               }}
             >
-              Confirm
+              {t('confirm')}
             </button>
-            <button className="btn toast-cancel" onClick={() => closeToast()}>
-              Cancel
+            <button className='btn toast-cancel' onClick={() => closeToast()}>
+              {t('cancel')}
             </button>
           </div>
         </div>
       ),
-      { autoClose: false, closeOnClick: false, draggable: false },
+      { autoClose: false, closeOnClick: false, draggable: false }
     )
   }
 
   return (
     <section>
-      <h2>Log</h2>
+      <h2>{t('logTitle')}</h2>
       {entries.length > 0 && (
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: 12,
+            marginBottom: 12
           }}
         >
-          <div style={{ color: 'var(--muted)' }}>{entries.length} entries</div>
+          <div style={{ color: 'var(--muted)' }}>
+            {entries.length} {t('entries')}
+          </div>
           <div>
-            <button onClick={confirmClearLog} className="btn clear-btn">
-              Clear
+            <button
+              onClick={confirmClearLog}
+              className='btn clear-btn'
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            >
+              <Trash2 size={14} />
+              {t('clearLog')}
             </button>
           </div>
         </div>
       )}
 
-      <div className="log-list">
+      <div className='log-list'>
         {entries.length === 0 && (
-          <div className="empty-positions">
-            <div className="empty-emoji">📝</div>
-            <div className="empty-title">No logged matches yet</div>
-            <div className="empty-sub">
-              Finish a match and press "Log result" to add an entry here.
+          <div className='empty-positions'>
+            <div className='empty-emoji'>
+              <ClipboardList size={48} strokeWidth={1.5} color='var(--muted)' />
             </div>
+            <div className='empty-title'>{t('noLoggedMatches')}</div>
+            <div className='empty-sub'>{t('noLoggedMatchesSub')}</div>
           </div>
         )}
         {entries.map(e => (
-          <div key={e.id} className="log-item">
-            <div className="log-grid">
-              <div className="log-left">
-                <div className="log-left-top">
-                  <div className="log-emoji">{e.leftEmoji}</div>
-                  <div className="log-player">
-                    <div className="log-name">{e.leftName}</div>
-                    <div className="log-score">
+          <div key={e.id} className='log-item'>
+            <div className='log-grid'>
+              <div className='log-left'>
+                <div className='log-left-top'>
+                  <div className='log-emoji'>{e.leftEmoji}</div>
+                  <div className='log-player'>
+                    <div className='log-name'>{e.leftName}</div>
+                    <div className='log-score'>
                       {e.leftScore} {e.winner === e.leftName && '🎉'}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="log-vs">vs</div>
+              <div className='log-vs'>vs</div>
 
-              <div className="log-right">
-                <div className="log-right-top">
-                  <div className="log-player log-player-right">
-                    <div className="log-name">{e.rightName}</div>
-                    <div className="log-score">
+              <div className='log-right'>
+                <div className='log-right-top'>
+                  <div className='log-player log-player-right'>
+                    <div className='log-name'>{e.rightName}</div>
+                    <div className='log-score'>
                       {e.rightScore} {e.winner === e.rightName && '🎉'}
                     </div>
                   </div>
-                  <div className="log-emoji">{e.rightEmoji}</div>
+                  <div className='log-emoji'>{e.rightEmoji}</div>
                 </div>
               </div>
             </div>
 
-            <div className="log-date">
+            <div className='log-date'>
               {new Date(e.timestamp).toLocaleString()}
             </div>
           </div>

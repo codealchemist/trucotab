@@ -1,11 +1,14 @@
 :root {
   --bg: #0b1220;
   --surface: #0f1724;
+  --panel-bg: var(--surface);
   --muted: #94a3b8;
   --accent: #60a5fa;
   --accent-2: #fb7185;
   --text: #e6eef8;
   --divider: #203040;
+  --panel-border: var(--divider);
+  --panel-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   --success: #16a34a;
   --danger: #dc2626;
   --row-hover: rgba(255, 255, 255, 0.06);
@@ -22,17 +25,20 @@
 }
 
 [data-theme='light'] {
-  --bg: #f8fafc;
+  --bg: #f1f5f9;
   --surface: #ffffff;
+  --panel-bg: #ffffff;
   --muted: #475569;
-  --accent: #2563eb;
-  --accent-2: #ef4444;
+  --accent: #1d4ed8;
+  --accent-2: #dc2626;
   --text: #0f172a;
-  --divider: #e6eef8;
-  --success: #16a34a;
-  --danger: #dc2626;
-  --row-hover: rgba(0, 0, 0, 0.08);
-  --row-alt: rgba(0, 0, 0, 0.03);
+  --divider: #cbd5e1;
+  --panel-border: #cbd5e1;
+  --panel-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --success: #15803d;
+  --danger: #b91c1c;
+  --row-hover: rgba(15, 23, 42, 0.06);
+  --row-alt: #f8fafc;
 }
 
 body {
@@ -120,7 +126,8 @@ main {
   gap: 12px;
 }
 .menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 14px 8px;
   color: var(--text);
   text-decoration: none;
@@ -166,7 +173,8 @@ section h2 {
   min-height: 72px;
   border-radius: 10px;
   background: var(--surface);
-  border: 1px solid var(--divider);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
 }
 .setting-left {
   display: flex;
@@ -383,9 +391,10 @@ section h2 {
   flex-direction: column;
   align-items: center;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface);
   border-radius: 10px;
-  border: 1px solid var(--divider);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
 }
 .player-name {
   font-size: 1rem;
@@ -576,6 +585,12 @@ section h2 {
   font-size: 1.6rem;
   font-weight: 700;
 }
+.winner-extra-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  text-align: center;
+}
 
 .confetti-piece {
   position: absolute;
@@ -726,6 +741,10 @@ section h2 {
 /* Log styles */
 .log-list {
   overflow: hidden;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
 }
 .log-item {
   position: relative;
@@ -814,9 +833,10 @@ section h2 {
 
 /* Positions grid styles (full-width, no horizontal scrolling) */
 .positions-grid-wrapper {
-  border: 1px solid var(--divider);
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
   background: var(--surface);
+  box-shadow: var(--panel-shadow);
   margin-bottom: 12px;
   overflow-x: hidden;
   width: 100%;
@@ -875,9 +895,10 @@ section h2 {
 
 /* Empty positions view */
 .empty-positions {
-  border: 1px solid var(--divider);
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
   background: var(--surface);
+  box-shadow: var(--panel-shadow);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -984,6 +1005,96 @@ section h2 {
 .winner-close-x:focus {
   outline: 2px solid rgba(96, 165, 250, 0.28);
   outline-offset: 2px;
+}
+
+/* Header controls (Language, Theme, Share) */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--divider);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.header-btn:hover {
+  background: var(--row-hover);
+  border-color: var(--muted);
+}
+
+/* Share modal styles */
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.share-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+.share-modal h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.share-desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.qr-container {
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0;
+}
+.share-url-row {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+.share-url-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--divider);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.share-copy-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share-copy-btn:hover {
+  filter: brightness(0.95);
 }
 
 /* Player modal styles */

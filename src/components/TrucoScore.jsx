@@ -15,15 +15,18 @@ import {
   decRight,
   resetMatch,
   selectMatch,
-  selectMaxScore,
+  selectMaxScore
 } from '../store/matchSlice'
 import { resetScores } from '../store/matchSlice'
 import { addLog } from '../store/logSlice'
+import { useTranslation } from '../i18n/useTranslation'
+import { X } from 'lucide-react'
 
 const EMOJIS = ['🂠', '😀', '😎', '🃏', '🎉', '🥇', '🔥']
 
 export default function TrucoScore() {
   const dispatch = useDispatch()
+  const { t } = useTranslation()
   const match = useSelector(selectMatch)
   const leftName = match.leftName
   const leftEmoji = match.leftEmoji
@@ -217,10 +220,10 @@ export default function TrucoScore() {
     toast(
       ({ closeToast }) => (
         <div style={{ padding: 8 }}>
-          <div>Clear match? This will reset names and scores.</div>
+          <div>{t('resetMatchConfirm')}</div>
           <div style={{ marginTop: 8 }}>
             <button
-              className="btn toast-confirm"
+              className='btn toast-confirm'
               onClick={() => {
                 dispatch(resetMatch())
                 if (typeof callback === 'function') {
@@ -229,15 +232,15 @@ export default function TrucoScore() {
                 closeToast()
               }}
             >
-              Confirm
+              {t('confirm')}
             </button>
-            <button className="btn toast-cancel" onClick={() => closeToast()}>
-              Cancel
+            <button className='btn toast-cancel' onClick={() => closeToast()}>
+              {t('cancel')}
             </button>
           </div>
         </div>
       ),
-      { autoClose: false, closeOnClick: false, draggable: false },
+      { autoClose: false, closeOnClick: false, draggable: false }
     )
   }
 
@@ -245,10 +248,10 @@ export default function TrucoScore() {
     toast(
       ({ closeToast }) => (
         <div style={{ padding: 8 }}>
-          <div>Clear scores? Names and emojis will be preserved.</div>
+          <div>{t('clearScoresConfirm')}</div>
           <div style={{ marginTop: 8 }}>
             <button
-              className="btn toast-confirm"
+              className='btn toast-confirm'
               onClick={() => {
                 dispatch(resetScores())
                 setLoggedThisMatch(false)
@@ -258,15 +261,15 @@ export default function TrucoScore() {
                 closeToast()
               }}
             >
-              Confirm
+              {t('confirm')}
             </button>
-            <button className="btn toast-cancel" onClick={() => closeToast()}>
-              Cancel
+            <button className='btn toast-cancel' onClick={() => closeToast()}>
+              {t('cancel')}
             </button>
           </div>
         </div>
       ),
-      { autoClose: false, closeOnClick: false, draggable: false },
+      { autoClose: false, closeOnClick: false, draggable: false }
     )
   }
 
@@ -281,13 +284,13 @@ export default function TrucoScore() {
         rightScore,
         matchType,
         winner: winner === 'left' ? leftName : rightName,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString()
       }
       dispatch(addLog(payload))
       // clear scores but keep names/emojis
       dispatch(resetScores())
       setLoggedThisMatch(true)
-      toast('Result logged')
+      toast(t('matchLoggedToast'))
     } catch (err) {
       console.error('log result failed', err)
       toast('Failed to log result')
@@ -298,25 +301,25 @@ export default function TrucoScore() {
     toast(
       ({ closeToast }) => (
         <div style={{ padding: 8 }}>
-          <div>Log result? This will save the match and clear the scores.</div>
+          <div>{t('logResult')}?</div>
           <div style={{ marginTop: 8 }}>
             <button
-              className="btn toast-confirm"
+              className='btn toast-confirm'
               onClick={() => {
                 handleLogResult()
                 closeToast()
                 setShowWinner(false)
               }}
             >
-              Confirm
+              {t('confirm')}
             </button>
-            <button className="btn toast-cancel" onClick={() => closeToast()}>
-              Cancel
+            <button className='btn toast-cancel' onClick={() => closeToast()}>
+              {t('cancel')}
             </button>
           </div>
         </div>
       ),
-      { autoClose: false, closeOnClick: false, draggable: false },
+      { autoClose: false, closeOnClick: false, draggable: false }
     )
   }
 
@@ -339,43 +342,43 @@ export default function TrucoScore() {
 
   return (
     <>
-      <div className="truco-score">
-        <div className="match-type">
+      <div className='truco-score'>
+        <div className='match-type'>
           <label>
             <input
-              type="radio"
-              name="match"
-              value="half"
+              type='radio'
+              name='match'
+              value='half'
               checked={matchType === 'half'}
               onChange={() => dispatch(setMatchType('half'))}
             />
-            A 15
+            {t('to15')}
           </label>
           <label>
             <input
-              type="radio"
-              name="match"
-              value="full"
+              type='radio'
+              name='match'
+              value='full'
               checked={matchType === 'full'}
               onChange={() => dispatch(setMatchType('full'))}
             />
-            A 30
+            {t('to30')}
           </label>
-          <div className="match-type-actions">
-            <button className="btn clear-btn" onClick={confirmClear}>
-              Clear
+          <div className='match-type-actions'>
+            <button className='btn clear-btn' onClick={confirmClear}>
+              {t('resetMatch')}
             </button>
-            <button className="btn clear-btn" onClick={confirmClearScores}>
-              Clear scores
+            <button className='btn clear-btn' onClick={confirmClearScores}>
+              {t('clearScores')}
             </button>
           </div>
         </div>
 
-        <div className="board">
-          <div className="player left">
-            <div className="player-name-row">
+        <div className='board'>
+          <div className='player left'>
+            <div className='player-name-row'>
               <input
-                className="player-name"
+                className='player-name'
                 value={leftName}
                 onChange={e => dispatch(setLeftName(e.target.value))}
                 onFocus={selectAll}
@@ -384,32 +387,32 @@ export default function TrucoScore() {
                 onKeyDown={handleNameKeyDown}
               />
               <button
-                className="btn emoji-profile"
-                aria-label="Left player emoji"
+                className='btn emoji-profile'
+                aria-label='Left player emoji'
                 onClick={() => setPickerOpen('left')}
-                type="button"
+                type='button'
               >
                 <span aria-hidden>{leftEmoji}</span>
               </button>
             </div>
-            <div className="points-divider" />
-            <div className="points">{leftScore}</div>
-            <div className="controls">
-              <button className="btn" onClick={() => inc('left')}>
+            <div className='points-divider' />
+            <div className='points'>{leftScore}</div>
+            <div className='controls'>
+              <button className='btn' onClick={() => inc('left')}>
                 +1
               </button>
-              <button className="btn" onClick={() => dec('left')}>
+              <button className='btn' onClick={() => dec('left')}>
                 -1
               </button>
             </div>
           </div>
 
-          <div className="vertical-separator" />
+          <div className='vertical-separator' />
 
-          <div className="player right">
-            <div className="player-name-row">
+          <div className='player right'>
+            <div className='player-name-row'>
               <input
-                className="player-name"
+                className='player-name'
                 value={rightName}
                 onChange={e => dispatch(setRightName(e.target.value))}
                 onFocus={selectAll}
@@ -418,28 +421,28 @@ export default function TrucoScore() {
                 onKeyDown={handleNameKeyDown}
               />
               <button
-                className="btn emoji-profile"
-                aria-label="Right player emoji"
+                className='btn emoji-profile'
+                aria-label='Right player emoji'
                 onClick={() => setPickerOpen('right')}
-                type="button"
+                type='button'
               >
                 <span aria-hidden>{rightEmoji}</span>
               </button>
             </div>
-            <div className="points-divider" />
-            <div className="points">{rightScore}</div>
-            <div className="controls">
-              <button className="btn" onClick={() => inc('right')}>
+            <div className='points-divider' />
+            <div className='points'>{rightScore}</div>
+            <div className='controls'>
+              <button className='btn' onClick={() => inc('right')}>
                 +1
               </button>
-              <button className="btn" onClick={() => dec('right')}>
+              <button className='btn' onClick={() => dec('right')}>
                 -1
               </button>
             </div>
           </div>
         </div>
         <div
-          className="shortcuts"
+          className='shortcuts'
           style={{ marginTop: 10, color: 'var(--muted)', fontSize: '0.9rem' }}
         >
           Shortcuts: Q/A left +/-, P/L right +/-, H/F half/full, C clear, T
@@ -460,6 +463,7 @@ export default function TrucoScore() {
         winner={winner}
         winnerName={winner === 'left' ? leftName : rightName}
         winnerEmoji={winner === 'left' ? leftEmoji : rightEmoji}
+        scoreDiff={Math.abs(leftScore - rightScore)}
         onClose={() => {
           setShowWinner(false)
           setWinnerAcknowledged(true)
@@ -482,18 +486,18 @@ export function EmojiPickerOverlay({ openFor, onClose, onChoose }) {
   if (!openFor) return null
   return (
     <div
-      className="emoji-overlay"
-      role="dialog"
-      aria-modal="true"
+      className='emoji-overlay'
+      role='dialog'
+      aria-modal='true'
       onClick={onClose}
     >
-      <div className="emoji-overlay-backdrop" />
-      <div className="emoji-overlay-content">
-        <div className="emoji-grid">
+      <div className='emoji-overlay-backdrop' />
+      <div className='emoji-overlay-content'>
+        <div className='emoji-grid'>
           {EMOJIS.map(em => (
             <button
               key={em}
-              className="btn emoji-btn"
+              className='btn emoji-btn'
               onClick={() => {
                 onChoose(openFor, em)
                 onClose()
@@ -514,12 +518,14 @@ export function WinnerOverlay({
   winner,
   winnerName,
   winnerEmoji,
+  scoreDiff,
   onClose,
   onClear,
   onLog,
-  logged,
+  logged
 }) {
   if (!show) return null
+  const { t } = useTranslation()
 
   const colors = [
     '#F97316',
@@ -527,7 +533,7 @@ export function WinnerOverlay({
     '#FB7185',
     '#34D399',
     '#F59E0B',
-    '#A78BFA',
+    '#A78BFA'
   ]
   const pieces = Array.from({ length: 40 }).map((_, i) => {
     const left = Math.random() * 100
@@ -537,57 +543,62 @@ export function WinnerOverlay({
     return (
       <div
         key={i}
-        className="confetti-piece"
+        className='confetti-piece'
         style={{
           left: `${left}%`,
           background: bg,
           animationDelay: `${delay}s`,
-          transform: `rotate(${rotate}deg)`,
+          transform: `rotate(${rotate}deg)`
         }}
       />
     )
   })
 
   return (
-    <div className="winner-overlay" role="status" aria-live="polite">
-      <div className="tada">{pieces}</div>
-      <div className="winner-content">
-        <div className="winner-card">
+    <div className='winner-overlay' role='status' aria-live='polite'>
+      <div className='tada'>{pieces}</div>
+      <div className='winner-content'>
+        <div className='winner-card'>
           <button
-            className="btn winner-close-x"
-            aria-label="Close"
-            type="button"
+            className='btn winner-close-x'
+            aria-label='Close'
+            type='button'
             onClick={onClose}
           >
-            ✕
+            <X size={20} />
           </button>
-          <div className="winner-emoji">{winnerEmoji}</div>
-          <div className="winner-text">{winnerName} wins!</div>
+          <div className='winner-emoji'>{winnerEmoji}</div>
+          <div className='winner-text'>
+            {winnerName} {t('wins')}
+          </div>
+          {scoreDiff > 14 && (
+            <div className='winner-extra-text'>{t('blowoutWin')}</div>
+          )}
           <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
             {typeof onLog === 'function' && (
               <button
-                className="btn winner-close-btn winner-log-btn"
+                className='btn winner-close-btn winner-log-btn'
                 onClick={e => {
                   onLog()
                 }}
                 disabled={!!logged}
               >
-                {logged ? 'Logged' : 'Log result'}
+                {logged ? t('logged') : t('logResult')}
               </button>
             )}
             <button
-              className="btn winner-close-btn"
+              className='btn winner-close-btn'
               onClick={() => {
                 if (onClear) onClear()
                 else onClose()
               }}
             >
-              Close & Clear Scores
+              {t('closeAndClear')}
             </button>
           </div>
         </div>
       </div>
-      <div className="winner-backdrop" />
+      <div className='winner-backdrop' />
     </div>
   )
 }

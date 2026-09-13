@@ -15,14 +15,15 @@ import './styles.css'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
+import { registerServiceWorker } from './registerServiceWorker'
 
 function ThemedToast() {
   const theme = useSelector(
-    s => (s && s.settings && s.settings.theme) || 'dark',
+    s => (s && s.settings && s.settings.theme) || 'dark'
   )
   // react-toastify expects 'light' | 'dark' | 'colored'
   const t = theme === 'dark' ? 'dark' : 'light'
-  return <ToastContainer theme={t} position="bottom-center" />
+  return <ToastContainer theme={t} position='bottom-center' />
 }
 
 const router = createBrowserRouter([
@@ -35,15 +36,15 @@ const router = createBrowserRouter([
         element: <Home />,
         loader: async () => {
           return { message: 'Bienvenido! 🖖' }
-        },
+        }
       },
       { path: 'about', element: <About /> },
       { path: 'js', element: <JsExample /> },
       { path: 'settings', element: <Settings /> },
       { path: 'log', element: <LogRoute /> },
-      { path: 'leaderboard', element: <LeaderboardPositionsRoute /> },
-    ],
-  },
+      { path: 'leaderboard', element: <LeaderboardPositionsRoute /> }
+    ]
+  }
 ])
 
 createRoot(document.getElementById('root')).render(
@@ -54,5 +55,7 @@ createRoot(document.getElementById('root')).render(
         <ThemedToast />
       </PersistGate>
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
+
+registerServiceWorker()
