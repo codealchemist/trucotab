@@ -21,8 +21,10 @@ import { resetScores } from '../store/matchSlice'
 import { addLog } from '../store/logSlice'
 import { useTranslation } from '../i18n/useTranslation'
 import { X, RotateCcw, Eraser, FileText } from 'lucide-react'
+import { EmojiPickerOverlay } from './EmojiPickerOverlay'
+import { BadgeDisplay } from './BadgeDisplay'
 
-const EMOJIS = ['🂠', '😀', '😎', '🃏', '🎉', '🥇', '🔥']
+export { EmojiPickerOverlay }
 
 export default function TrucoScore() {
   const dispatch = useDispatch()
@@ -406,7 +408,10 @@ export default function TrucoScore() {
                 onClick={() => setPickerOpen('left')}
                 type='button'
               >
-                <span aria-hidden>{leftEmoji}</span>
+                <BadgeDisplay
+                  value={leftEmoji}
+                  imgClassName='badge-profile-img'
+                />
               </button>
             </div>
             <div className='points-divider' />
@@ -440,7 +445,10 @@ export default function TrucoScore() {
                 onClick={() => setPickerOpen('right')}
                 type='button'
               >
-                <span aria-hidden>{rightEmoji}</span>
+                <BadgeDisplay
+                  value={rightEmoji}
+                  imgClassName='badge-profile-img'
+                />
               </button>
             </div>
             <div className='points-divider' />
@@ -465,6 +473,13 @@ export default function TrucoScore() {
       </div>
       <EmojiPickerOverlay
         openFor={pickerOpen}
+        currentBadge={
+          pickerOpen === 'left'
+            ? leftEmoji
+            : pickerOpen === 'right'
+              ? rightEmoji
+              : null
+        }
         onClose={() => setPickerOpen(null)}
         onChoose={(side, em) => {
           if (side === 'left') dispatch(setLeftEmoji(em))
@@ -492,38 +507,6 @@ export default function TrucoScore() {
         logged={loggedThisMatch}
       />
     </>
-  )
-}
-
-// emoji picker overlay rendered outside main flow
-export function EmojiPickerOverlay({ openFor, onClose, onChoose }) {
-  if (!openFor) return null
-  return (
-    <div
-      className='emoji-overlay'
-      role='dialog'
-      aria-modal='true'
-      onClick={onClose}
-    >
-      <div className='emoji-overlay-backdrop' />
-      <div className='emoji-overlay-content'>
-        <div className='emoji-grid'>
-          {EMOJIS.map(em => (
-            <button
-              key={em}
-              className='btn emoji-btn'
-              onClick={() => {
-                onChoose(openFor, em)
-                onClose()
-              }}
-              aria-label={`Choose ${em}`}
-            >
-              {em}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
   )
 }
 
@@ -581,7 +564,9 @@ export function WinnerOverlay({
           >
             <X size={20} />
           </button>
-          <div className='winner-emoji'>{winnerEmoji}</div>
+          <div className='winner-emoji'>
+            <BadgeDisplay value={winnerEmoji} imgClassName='badge-winner-img' />
+          </div>
           <div className='winner-text'>
             {winnerName} {t('wins')}
           </div>

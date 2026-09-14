@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+    <circle cx="50" cy="60" r="45" fill="#6CABDD" stroke="#FFFFFF" stroke-width="4"/>
+    <path d="M50,15 L85,10 L85,40 Q50,45 15,40 L15,10 Z" fill="#1C2C5B" opacity="0.8"/>
+    <circle cx="50" cy="60" r="22" fill="#FFFFFF" opacity="0.2"/>
+    <text x="50" y="66" font-size="16" font-weight="900" fill="#FFFFFF" text-anchor="middle" font-family="system-ui, sans-serif" letter-spacing="-0.5">MCI</text>
+  </svg>

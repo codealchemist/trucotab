@@ -38,6 +38,26 @@ export const translations = {
     confirm: 'Confirmar',
     cancel: 'Cancelar',
 
+    // Emoji / Badge selector modal
+    selectBadge: 'Seleccionar insignia',
+    tabEmojis: 'Emojis',
+    tabCountryFlags: 'Banderas de países',
+    tabSoccerFlags: 'Banderas de fútbol',
+    selectLeague: 'Seleccionar liga o torneo',
+    argentinaPrimeraDivision: 'Argentina Primera División',
+    englishPremierLeague: 'English Premier League',
+    fifaWorldCup2026: 'FIFA World Cup 2026',
+    germanyBundesliga: 'Germany Bundesliga',
+    spainLaLiga: 'Spain La Liga',
+    uclChampionsLeague: 'UEFA Champions League',
+    uefaNationsLeague: 'UEFA Nations League',
+    usaMls: 'USA MLS',
+    searchBadge: 'Buscar por nombre...',
+    searchEmoji: 'Buscar emoji...',
+    searchCountry: 'Buscar país o bandera...',
+    searchSoccer: 'Buscar equipo de fútbol...',
+    noBadgesFound: 'No se encontraron insignias',
+
     // Settings
     settings: 'Configuración',
     enableSound: 'Habilitar efectos de sonido',
@@ -129,6 +149,26 @@ export const translations = {
     matchLoggedToast: 'Match logged!',
     confirm: 'Confirm',
     cancel: 'Cancel',
+
+    // Emoji / Badge selector modal
+    selectBadge: 'Select badge',
+    tabEmojis: 'Emojis',
+    tabCountryFlags: 'Country flags',
+    tabSoccerFlags: 'Soccer flags',
+    selectLeague: 'Select league or tournament',
+    argentinaPrimeraDivision: 'Argentina Primera División',
+    englishPremierLeague: 'English Premier League',
+    fifaWorldCup2026: 'FIFA World Cup 2026',
+    germanyBundesliga: 'Germany Bundesliga',
+    spainLaLiga: 'Spain La Liga',
+    uclChampionsLeague: 'UEFA Champions League',
+    uefaNationsLeague: 'UEFA Nations League',
+    usaMls: 'USA MLS',
+    searchBadge: 'Search by name...',
+    searchEmoji: 'Search emoji...',
+    searchCountry: 'Search country or flag...',
+    searchSoccer: 'Search soccer team...',
+    noBadgesFound: 'No badges found',
 
     // Settings
     settings: 'Settings',

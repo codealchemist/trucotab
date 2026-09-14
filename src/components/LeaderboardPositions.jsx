@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { selectLog } from '../store/logSlice'
 import { useTranslation } from '../i18n/useTranslation'
 import { Trophy, X } from 'lucide-react'
+import { BadgeDisplay } from './BadgeDisplay'
 
 export default function LeaderboardPositions() {
   const entries = useSelector(s => selectLog(s))
@@ -90,7 +91,9 @@ export default function LeaderboardPositions() {
               onClick={() => openPlayer(r)}
               type='button'
             >
-              <div className='cell-emoji'>{r.emoji || '🂠'}</div>
+              <div className='cell-emoji'>
+                <BadgeDisplay value={r.emoji} imgClassName='badge-cell-img' />
+              </div>
               <div className='cell-name'>{r.name}</div>
               <div className='cell-points'>{r.won}</div>
             </button>
@@ -110,7 +113,12 @@ export default function LeaderboardPositions() {
               <X size={20} />
             </button>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <div style={{ fontSize: '2rem' }}>{selected.emoji || '🂠'}</div>
+              <div>
+                <BadgeDisplay
+                  value={selected.emoji}
+                  imgClassName='badge-profile-img'
+                />
+              </div>
               <div>
                 <h3 style={{ margin: 0 }}>{selected.name}</h3>
               </div>

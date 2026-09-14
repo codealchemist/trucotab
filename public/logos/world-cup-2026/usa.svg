@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+    <path d="M15,10 L85,10 L85,65 C85,95 50,115 50,115 C50,115 15,95 15,65 Z" fill="#FFFFFF" stroke="#002868" stroke-width="4"/>
+    <rect x="15" y="10" width="70" height="30" fill="#002868"/>
+    <text x="50" y="32" font-size="16" font-weight="900" fill="#FFFFFF" text-anchor="middle" font-family="sans-serif">USA</text>
+    <rect x="23" y="40" width="8" height="60" fill="#BF0A30"/>
+    <rect x="39" y="40" width="8" height="65" fill="#BF0A30"/>
+    <rect x="55" y="40" width="8" height="65" fill="#BF0A30"/>
+    <rect x="71" y="40" width="8" height="60" fill="#BF0A30"/>
+  </svg>
