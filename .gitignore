@@ -35,6 +35,10 @@ coverage/
 *.tmp
 .cache/
 
+# Ignore all markdown files except README.md
+*.md
+!README.md
+
 # Lockfiles (if you prefer not to commit lockfiles, uncomment)
 # package-lock.json
 # yarn.lock
