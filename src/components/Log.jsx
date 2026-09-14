@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { selectLog, clearLog } from '../store/logSlice'
 import { useTranslation } from '../i18n/useTranslation'
 import { ClipboardList, Trash2 } from 'lucide-react'
+import { BadgeDisplay } from './BadgeDisplay'
 
 export default function Log() {
   const dispatch = useDispatch()
@@ -78,7 +79,12 @@ export default function Log() {
             <div className='log-grid'>
               <div className='log-left'>
                 <div className='log-left-top'>
-                  <div className='log-emoji'>{e.leftEmoji}</div>
+                  <div className='log-emoji'>
+                    <BadgeDisplay
+                      value={e.leftEmoji}
+                      imgClassName='badge-log-img'
+                    />
+                  </div>
                   <div className='log-player'>
                     <div className='log-name'>{e.leftName}</div>
                     <div className='log-score'>
@@ -98,7 +104,12 @@ export default function Log() {
                       {e.rightScore} {e.winner === e.rightName && '🎉'}
                     </div>
                   </div>
-                  <div className='log-emoji'>{e.rightEmoji}</div>
+                  <div className='log-emoji'>
+                    <BadgeDisplay
+                      value={e.rightEmoji}
+                      imgClassName='badge-log-img'
+                    />
+                  </div>
                 </div>
               </div>
             </div>

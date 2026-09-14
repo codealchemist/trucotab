@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+    <path d="M15,12 L85,12 L85,65 C85,95 50,115 50,115 C50,115 15,95 15,65 Z" fill="#002395" stroke="#ED2939" stroke-width="4"/>
+    <polygon points="40,2 43,6 47,6 44,9 45,13 40,10 35,13 36,9 33,6 37,6" fill="#E3B136"/>
+    <polygon points="60,2 63,6 67,6 64,9 65,13 60,10 55,13 56,9 53,6 57,6" fill="#E3B136"/>
+    <path d="M50,30 Q58,32 60,40 Q55,42 50,38 Q45,45 52,55 Q56,65 50,75 Q42,65 46,50 Z" fill="#E3B136"/>
+    <text x="50" y="95" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="sans-serif">FFF</text>
+  </svg>
