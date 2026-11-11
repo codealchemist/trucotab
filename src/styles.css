@@ -631,16 +631,28 @@ section h2 {
   border: 1px dashed var(--divider);
   background: var(--surface);
   color: var(--muted);
-  opacity: 0.45;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   transition:
-    opacity 0.15s ease,
+    background 0.15s ease,
     border-color 0.15s ease,
     color 0.15s ease;
+}
+/* Dim only the icon, never the button itself: a translucent button would
+   let the header divider line show through it. */
+.hand-btn svg {
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+/* Hover tint layered over an opaque surface so the divider stays hidden. */
+.player .emoji-profile:hover,
+.player .hand-btn:hover {
+  background:
+    linear-gradient(var(--row-hover), var(--row-hover)),
+    var(--surface);
 }
 .player.left .hand-btn {
   right: 12px;
@@ -648,15 +660,20 @@ section h2 {
 .player.right .hand-btn {
   left: 12px;
 }
-.hand-btn:hover {
+.hand-btn:hover svg {
   opacity: 0.8;
 }
 .hand-btn.active {
-  opacity: 1;
   color: var(--accent);
   border: 2px solid var(--accent);
 }
+.hand-btn.active svg {
+  opacity: 1;
+}
 .hand-btn.pending {
+  animation: hand-flash-border 1.6s ease-in-out infinite;
+}
+.hand-btn.pending svg {
   animation: hand-flash 1.6s ease-in-out infinite;
 }
 @keyframes hand-flash {
@@ -668,8 +685,18 @@ section h2 {
     opacity: 0.2;
   }
 }
+@keyframes hand-flash-border {
+  0%,
+  100% {
+    border-color: var(--accent);
+  }
+  50% {
+    border-color: var(--divider);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hand-btn.pending {
+  .hand-btn.pending,
+  .hand-btn.pending svg {
     animation-duration: 3s;
   }
 }
