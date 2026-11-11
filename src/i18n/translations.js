@@ -90,6 +90,13 @@ export const translations = {
     aboutText3:
       '¡Porque lo que importa es jugar al truco y que no te rompan las bolas!',
     aboutText4: '¡A disfrutar con amigos! ¡Chau!',
+    aboutCollabTitle: 'Hecho en comunidad',
+    aboutCollabText:
+      'TrucoTab es open source y se arma entre todos. ¿Encontraste un bug o tenés una idea para mejorarlo? Abrí un issue en GitHub, ¡toda ayuda suma!',
+    aboutViewOnGithub: 'Ver en GitHub',
+    aboutReportBug: 'Reportar un bug',
+    aboutSuggestFeature: 'Sugerir una idea',
+    aboutMadeBy: 'Hecho con',
 
     // Log
     logTitle: 'Historial',
@@ -208,6 +215,13 @@ export const translations = {
     aboutText2: 'An open source truco scorekeeper, forever free and ad-free 💪',
     aboutText3: 'Because what matters is playing truco without hassle!',
     aboutText4: 'Enjoy with friends! Bye!',
+    aboutCollabTitle: 'Built in the open',
+    aboutCollabText:
+      'TrucoTab is open source and grows with its players. Found a bug or have an idea to make it better? Open an issue on GitHub, every contribution counts!',
+    aboutViewOnGithub: 'View on GitHub',
+    aboutReportBug: 'Report a bug',
+    aboutSuggestFeature: 'Suggest a feature',
+    aboutMadeBy: 'Made with',
 
     // Log
     logTitle: 'Log',
