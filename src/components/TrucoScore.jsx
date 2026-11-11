@@ -20,6 +20,7 @@ import {
 import { resetScores } from '../store/matchSlice'
 import { addLog } from '../store/logSlice'
 import { useTranslation } from '../i18n/useTranslation'
+import { savePreferredMatchType } from '../utils/matchTypePreference'
 import { X, RotateCcw, Eraser, FileText } from 'lucide-react'
 import { EmojiPickerOverlay } from './EmojiPickerOverlay'
 import { BadgeDisplay } from './BadgeDisplay'
@@ -163,10 +164,10 @@ export default function TrucoScore() {
           confirmClear()
           break
         case 'h':
-          dispatch(setMatchType('half'))
+          selectMatchType('half')
           break
         case 'f':
-          dispatch(setMatchType('full'))
+          selectMatchType('full')
           break
         default:
           break
@@ -196,6 +197,11 @@ export default function TrucoScore() {
       }
     }
   }, [pickerOpen])
+
+  const selectMatchType = type => {
+    savePreferredMatchType(type)
+    dispatch(setMatchType(type))
+  }
 
   const inc = side => {
     if (side === 'left') dispatch(incLeft())
@@ -356,7 +362,7 @@ export default function TrucoScore() {
               role='radio'
               aria-checked={matchType === 'half'}
               className={`switch-btn ${matchType === 'half' ? 'active' : ''}`}
-              onClick={() => dispatch(setMatchType('half'))}
+              onClick={() => selectMatchType('half')}
             >
               {t('to15')}
             </button>
@@ -365,7 +371,7 @@ export default function TrucoScore() {
               role='radio'
               aria-checked={matchType === 'full'}
               className={`switch-btn ${matchType === 'full' ? 'active' : ''}`}
-              onClick={() => dispatch(setMatchType('full'))}
+              onClick={() => selectMatchType('full')}
             >
               {t('to30')}
             </button>

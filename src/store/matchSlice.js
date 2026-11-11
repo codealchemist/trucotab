@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { getPreferredMatchType } from '../utils/matchTypePreference'
 
 function log () {
   console.log('[ matchSlide ]', ...arguments)
@@ -9,7 +10,7 @@ const initialState = {
   leftEmoji: '🂠',
   rightName: 'Player B',
   rightEmoji: '🂠',
-  matchType: 'half',
+  matchType: getPreferredMatchType(),
   leftScore: 0,
   rightScore: 0,
 }
@@ -36,7 +37,7 @@ const slice = createSlice({
       state.rightName = 'Player B'
       state.leftEmoji = '🂠'
       state.rightEmoji = '🂠'
-      state.matchType = 'half'
+      state.matchType = getPreferredMatchType()
       state.leftScore = 0
       state.rightScore = 0
     }
