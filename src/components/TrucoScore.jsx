@@ -14,14 +14,21 @@ import {
   incRight,
   decRight,
   resetMatch,
+  toggleHand,
   selectMatch,
-  selectMaxScore
+  selectMaxScore,
+  selectHand
 } from '../store/matchSlice'
+import {
+  selectHandEnabled,
+  selectHandAutoRotate,
+  selectHandAutoRotateDelay
+} from '../store/settingsSlice'
 import { resetScores } from '../store/matchSlice'
 import { addLog } from '../store/logSlice'
 import { useTranslation } from '../i18n/useTranslation'
 import { savePreferredMatchType } from '../utils/matchTypePreference'
-import { X, RotateCcw, Eraser, FileText } from 'lucide-react'
+import { X, RotateCcw, Eraser, FileText, Hand } from 'lucide-react'
 import { EmojiPickerOverlay } from './EmojiPickerOverlay'
 import { BadgeDisplay } from './BadgeDisplay'
 
@@ -45,6 +52,24 @@ export default function TrucoScore() {
   const [winner, setWinner] = useState(null)
   const [winnerAcknowledged, setWinnerAcknowledged] = useState(false)
   const [loggedThisMatch, setLoggedThisMatch] = useState(false)
+  const hand = useSelector(selectHand)
+  const handEnabled = useSelector(selectHandEnabled)
+  const handAutoRotate = useSelector(selectHandAutoRotate)
+  // seconds after the last score change before the hand passes to the other player
+  const handAutoRotateDelay = useSelector(selectHandAutoRotateDelay)
+  // true while an automatic hand rotation is scheduled (indicator flashes)
+  const [handPending, setHandPending] = useState(false)
+  const handTimerRef = useRef(null)
+  // Latest values for timers and the keyboard listener, which may hold stale closures.
+  const latestRef = useRef({})
+  latestRef.current = {
+    handEnabled,
+    handAutoRotate,
+    handAutoRotateDelay,
+    leftScore,
+    rightScore,
+    maxScore
+  }
 
   const audioCtxRef = useRef(null)
 
@@ -203,23 +228,87 @@ export default function TrucoScore() {
     dispatch(setMatchType(type))
   }
 
+  const cancelHandRotation = () => {
+    clearTimeout(handTimerRef.current)
+    handTimerRef.current = null
+    setHandPending(false)
+  }
+
+  // (Re)start the countdown to pass the hand; every score change restarts it.
+  const scheduleHandRotation = () => {
+    const { handEnabled, handAutoRotate, handAutoRotateDelay } =
+      latestRef.current
+    if (!handEnabled || !handAutoRotate) return
+    clearTimeout(handTimerRef.current)
+    setHandPending(true)
+    handTimerRef.current = setTimeout(() => {
+      handTimerRef.current = null
+      setHandPending(false)
+      const { handEnabled, handAutoRotate, leftScore, rightScore, maxScore } =
+        latestRef.current
+      if (!handEnabled || !handAutoRotate) return
+      // match over: nobody plays next
+      if (leftScore >= maxScore || rightScore >= maxScore) return
+      dispatch(toggleHand())
+    }, handAutoRotateDelay * 1000)
+  }
+
+  // Clicking either player's hand button passes the hand manually.
+  const switchHand = () => {
+    cancelHandRotation()
+    dispatch(toggleHand())
+  }
+
+  useEffect(() => {
+    if (!handEnabled || !handAutoRotate) cancelHandRotation()
+  }, [handEnabled, handAutoRotate])
+
+  useEffect(() => () => clearTimeout(handTimerRef.current), [])
+
   const inc = side => {
+    const { leftScore, rightScore, maxScore } = latestRef.current
+    const current = side === 'left' ? leftScore : rightScore
     if (side === 'left') dispatch(incLeft())
     else dispatch(incRight())
     playClick()
+    if (current < maxScore) scheduleHandRotation()
   }
   const dec = side => {
+    const { leftScore, rightScore } = latestRef.current
+    const current = side === 'left' ? leftScore : rightScore
     if (side === 'left') dispatch(decLeft())
     else dispatch(decRight())
     playClick()
+    if (current > 0) scheduleHandRotation()
+  }
+
+  const renderHandButton = side => {
+    if (!handEnabled) return null
+    const active = hand === side
+    const classes = ['hand-btn', active ? 'active' : '']
+    if (active && handPending) classes.push('pending')
+    return (
+      <button
+        type='button'
+        className={classes.filter(Boolean).join(' ')}
+        aria-pressed={active}
+        aria-label={active ? t('handActive') : t('handGive')}
+        title={active ? t('handActive') : t('handGive')}
+        onClick={switchHand}
+      >
+        <Hand size={20} />
+      </button>
+    )
   }
 
   const clear = () => {
+    cancelHandRotation()
     dispatch(resetMatch())
     setLoggedThisMatch(false)
   }
 
   const clearScores = () => {
+    cancelHandRotation()
     dispatch(resetScores())
     setLoggedThisMatch(false)
   }
@@ -233,6 +322,7 @@ export default function TrucoScore() {
             <button
               className='btn toast-confirm'
               onClick={() => {
+                cancelHandRotation()
                 dispatch(resetMatch())
                 if (typeof callback === 'function') {
                   callback()
@@ -261,6 +351,7 @@ export default function TrucoScore() {
             <button
               className='btn toast-confirm'
               onClick={() => {
+                cancelHandRotation()
                 dispatch(resetScores())
                 setLoggedThisMatch(false)
                 if (typeof callback === 'function') {
@@ -296,6 +387,7 @@ export default function TrucoScore() {
       }
       dispatch(addLog(payload))
       // clear scores but keep names/emojis
+      cancelHandRotation()
       dispatch(resetScores())
       setLoggedThisMatch(true)
       toast(t('matchLoggedToast'))
@@ -398,6 +490,22 @@ export default function TrucoScore() {
 
         <div className='board'>
           <div className='player left'>
+            <button
+              type='button'
+              className='tap-zone dec'
+              aria-label={`${leftName} -1`}
+              onClick={() => dec('left')}
+            >
+              <span className='tap-half-circle'>-1</span>
+            </button>
+            <button
+              type='button'
+              className='tap-zone inc'
+              aria-label={`${leftName} +1`}
+              onClick={() => inc('left')}
+            >
+              <span className='tap-half-circle'>+1</span>
+            </button>
             <div className='player-name-row'>
               <input
                 className='player-name'
@@ -419,22 +527,31 @@ export default function TrucoScore() {
                   imgClassName='badge-profile-img'
                 />
               </button>
+              {renderHandButton('left')}
             </div>
             <div className='points-divider' />
             <div className='points'>{leftScore}</div>
-            <div className='controls'>
-              <button className='btn' onClick={() => inc('left')}>
-                +1
-              </button>
-              <button className='btn' onClick={() => dec('left')}>
-                -1
-              </button>
-            </div>
           </div>
 
           <div className='vertical-separator' />
 
           <div className='player right'>
+            <button
+              type='button'
+              className='tap-zone dec'
+              aria-label={`${rightName} -1`}
+              onClick={() => dec('right')}
+            >
+              <span className='tap-half-circle'>-1</span>
+            </button>
+            <button
+              type='button'
+              className='tap-zone inc'
+              aria-label={`${rightName} +1`}
+              onClick={() => inc('right')}
+            >
+              <span className='tap-half-circle'>+1</span>
+            </button>
             <div className='player-name-row'>
               <input
                 className='player-name'
@@ -456,17 +573,10 @@ export default function TrucoScore() {
                   imgClassName='badge-profile-img'
                 />
               </button>
+              {renderHandButton('right')}
             </div>
             <div className='points-divider' />
             <div className='points'>{rightScore}</div>
-            <div className='controls'>
-              <button className='btn' onClick={() => inc('right')}>
-                +1
-              </button>
-              <button className='btn' onClick={() => dec('right')}>
-                -1
-              </button>
-            </div>
           </div>
         </div>
         <div

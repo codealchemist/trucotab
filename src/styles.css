@@ -216,6 +216,71 @@ section h2 {
   color: var(--text);
   min-width: 220px;
 }
+/* Small custom dropdown shown next to a setting checkbox */
+.inline-select {
+  position: relative;
+  display: inline-block;
+}
+.inline-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--divider);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.inline-select-btn svg {
+  color: var(--muted);
+}
+.inline-select-btn:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+.inline-select-btn:focus-visible,
+.inline-select-btn[aria-expanded='true'] {
+  outline: none;
+  border-color: var(--accent);
+}
+.inline-select-btn:disabled {
+  cursor: default;
+}
+.inline-select-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  z-index: 50;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+.inline-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+}
+.inline-select-option:hover,
+.inline-select-option:focus {
+  outline: none;
+  background: var(--row-hover);
+}
+.inline-select-option.selected {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 @media (max-width: 720px) {
   .setting-row {
@@ -455,27 +520,158 @@ section h2 {
   font-weight: 700;
   margin: 8px 0;
 }
-.controls {
-  display: flex;
-  gap: 8px;
+/* Score actions: each player card is split in two tap zones.
+   Left half = -1, right half = +1. A half circle centered on the card
+   border marks each side. */
+.player {
+  --half-circle-size: 104px;
+  overflow: hidden;
+  min-height: 260px;
 }
-.controls button {
-  width: var(--control-size);
-  height: var(--control-size);
-  padding: 30px;
-  margin: 20px;
-  font-size: 1.1rem;
-  border-radius: 50%;
-  border: 1px solid var(--divider);
+.tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
   background: transparent;
   color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background 0.15s ease;
+}
+.tap-zone.dec {
+  left: 0;
+}
+.tap-zone.inc {
+  right: 0;
+}
+.tap-zone:hover {
+  background: var(--row-hover);
+}
+.tap-zone:active {
+  background: var(--row-hover);
+}
+.tap-zone:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.tap-half-circle {
+  position: absolute;
+  top: 50%;
+  width: var(--half-circle-size);
+  height: var(--half-circle-size);
+  border-radius: 50%;
+  border: 1px solid var(--divider);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-sizing: border-box;
+  pointer-events: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease;
+}
+.tap-zone.dec .tap-half-circle {
+  left: 0;
+  transform: translate(-50%, -50%);
+  justify-content: flex-end;
+  padding-right: calc(var(--half-circle-size) * 0.16);
+}
+.tap-zone.inc .tap-half-circle {
+  right: 0;
+  transform: translate(50%, -50%);
+  justify-content: flex-start;
+  padding-left: calc(var(--half-circle-size) * 0.16);
+}
+.tap-zone:hover .tap-half-circle {
+  border-color: var(--muted);
+}
+.tap-zone.dec:active .tap-half-circle {
+  transform: translate(-50%, -50%) scale(0.94);
+}
+.tap-zone.inc:active .tap-half-circle {
+  transform: translate(50%, -50%) scale(0.94);
+}
+/* Keep card content above the tap zones; only the name and badge
+   capture clicks, everything else falls through to the zones. */
+.player-name-row {
+  pointer-events: none;
+}
+.points-divider,
+.points {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.player-name {
+  position: relative;
+}
+.player-name,
+.player .emoji-profile,
+.player .hand-btn {
+  pointer-events: auto;
+  z-index: 2;
+}
+
+/* Hand ("mano") indicator: sits on the header corner opposite the badge. */
+.hand-btn {
+  --hand-size: 44px;
+  position: absolute;
+  top: calc(12px + (var(--emoji-size) - var(--hand-size)) / 2);
+  width: var(--hand-size);
+  height: var(--hand-size);
+  border-radius: 50%;
+  border: 1px dashed var(--divider);
+  background: var(--surface);
+  color: var(--muted);
+  opacity: 0.45;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  transition:
+    opacity 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
-.controls button:hover {
-  background: rgba(255, 255, 255, 0.02);
+.player.left .hand-btn {
+  right: 12px;
+}
+.player.right .hand-btn {
+  left: 12px;
+}
+.hand-btn:hover {
+  opacity: 0.8;
+}
+.hand-btn.active {
+  opacity: 1;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+.hand-btn.pending {
+  animation: hand-flash 1.6s ease-in-out infinite;
+}
+@keyframes hand-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hand-btn.pending {
+    animation-duration: 3s;
+  }
 }
 .vertical-separator {
   display: none;
@@ -1491,17 +1687,9 @@ section h2 {
     letter-spacing: -0.02em;
   }
 
-  .controls {
-    gap: 12px;
-  }
-
-  .controls button {
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
+  .player {
+    --half-circle-size: 88px;
+    min-height: 0;
   }
 
   .shortcuts {

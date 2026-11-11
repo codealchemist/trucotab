@@ -19,6 +19,8 @@ export const translations = {
     welcome: '¡Bienvenido! 🖖',
     to15: 'A 15',
     to30: 'A 30',
+    handActive: 'Es mano (tocar para pasar la mano)',
+    handGive: 'Darle la mano a este jugador',
     matchType: 'Tipo de partido',
     playerA: 'Jugador A',
     playerB: 'Jugador B',
@@ -63,6 +65,13 @@ export const translations = {
     enableSound: 'Habilitar efectos de sonido',
     enableSoundDesc:
       'Activar o desactivar sonido al presionar botones y al ganar.',
+    enableHand: 'Mostrar quién es mano',
+    enableHandDesc:
+      'Muestra un botón de mano en la tarjeta del jugador que empieza. Tocá cualquiera de los dos botones para pasar la mano.',
+    enableHandAutoRotate: 'Rotar la mano automáticamente',
+    enableHandAutoRotateDesc:
+      'Pasa la mano al otro jugador después del tiempo elegido desde el último cambio de puntaje. El indicador titila mientras tanto.',
+    handAutoRotateDelay: 'Tiempo para rotar la mano',
     theme: 'Tema',
     themeDesc:
       'Elige el tema de la app. También puedes presionar T para cambiarlo.',
@@ -131,6 +140,8 @@ export const translations = {
     welcome: 'Welcome! 🖖',
     to15: 'To 15',
     to30: 'To 30',
+    handActive: 'Hand: plays first (tap to pass the hand)',
+    handGive: 'Give the hand to this player',
     matchType: 'Match type',
     playerA: 'Player A',
     playerB: 'Player B',
@@ -175,6 +186,13 @@ export const translations = {
     enableSound: 'Enable sound effects',
     enableSoundDesc:
       'Toggle audible feedback for button presses and win events.',
+    enableHand: 'Show who is hand',
+    enableHandDesc:
+      "Shows a hand button on the card of the player who plays first. Tap either player's button to pass the hand.",
+    enableHandAutoRotate: 'Rotate hand automatically',
+    enableHandAutoRotateDesc:
+      'Passes the hand to the other player after the chosen time since the last score change. The indicator flashes while waiting.',
+    handAutoRotateDelay: 'Hand rotation delay',
     theme: 'Theme',
     themeDesc: 'Choose the app theme. You can also press T to toggle.',
     dark: 'Dark',
